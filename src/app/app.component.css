@@ -1,12 +1,11 @@
 .container {
     height: 100vh;
     display: grid;
-    grid-template-columns: 100px 1fr;
-    grid-template-rows: 1fr 200px;
+    grid-template-rows: 1fr min-content;
     gap: 0px 0px;
     grid-template-areas:
-        "canvas canvas"
-        "palette equation"
+        "canvas"
+        "equation"
 }
 
 .canvas {
@@ -14,12 +13,132 @@
     background-color: bisque;
 }
 
-.palette {
-    grid-area: palette;
-    background-color: aquamarine;
-}
-
 .equation {
     grid-area: equation;
     background-color: cadetblue;
+    display: flex;
+    justify-content: center;
+}
+
+.equation-list {
+    align-self: center;
+    justify-content: center;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    padding: 30px;
+}
+
+.equation-box {
+    padding: 20px 10px;
+    border-right: solid 1px #ccc;
+    color: rgba(0, 0, 0, 0.87);
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    background: white;
+    font-size: 14px;
+
+
+
+    width: 300px;
+    height: 300px;
+
+}
+
+.selected {
+    background-color: #999;
+}
+
+.cdk-drag-preview {
+    cursor: move;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+    border: none;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-custom-placeholder {
+    background: #ccc;
+    border: dotted 3px #999;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.matrixContainer {
+    display: grid;
+    grid-template-columns: min-content 1fr min-content;
+    grid-template-rows: min-content 1fr min-content;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+        "addBefore dragHandle addAfter"
+        "addBefore matrixContent addAfter"
+        "addBefore delete addAfter";
+}
+
+.addBefore {
+    grid-area: addBefore;
+    align-self: center;
+    position: relative;
+    left: -50%;
+}
+
+.addAfter {
+    grid-area: addAfter;
+    align-self: center;
+    position: relative;
+    left: 50%;
+}
+
+.dragHandle {
+    grid-area: dragHandle;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: -50%;
+    cursor: grab;
+}
+
+.deleteArea {
+    grid-area: delete;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 50%;
+}
+
+.matrixContent {
+    grid-area: matrixContent;
+    width: 200px;
+    height: 200px;
+    background-color: azure;
+}
+
+
+.hidden {
+    visibility: hidden;
+}
+.math {
+    align-self: center;
+    font-size: xxx-large;
+    font-family: math;
 }
