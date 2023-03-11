@@ -8,6 +8,7 @@ import {
   AddTransformationsComponent,
   TransformationType,
 } from './add-transformations/add-transformations.component';
+import { GraphicsViewComponent } from './graphics-view/graphics-view.component';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,7 @@ import {
     NgClass,
     NgIf,
     AddTransformationsComponent,
+    GraphicsViewComponent
   ],
 })
 export class AppComponent {
