@@ -1,0 +1,25 @@
+.container {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    grid-template-rows: 1fr 200px;
+    gap: 0px 0px;
+    grid-template-areas:
+        "canvas canvas"
+        "palette equation"
+}
+
+.canvas {
+    grid-area: canvas;
+    background-color: bisque;
+}
+
+.palette {
+    grid-area: palette;
+    background-color: aquamarine;
+}
+
+.equation {
+    grid-area: equation;
+    background-color: cadetblue;
+}
