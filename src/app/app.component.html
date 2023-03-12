@@ -1,13 +1,14 @@
 <div class="container">
-  <app-graphics-view class="canvas">
+  <app-graphics-view class="canvas" [matrices]="matrices | async">
 
   </app-graphics-view>
   <div class="equation">
     <span class="math">x' =</span>
-    <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="transformations" class="equation-list"
+    
+    <div cdkDropList #doneList="cdkDropList" *ngIf="transformations | async as trans" [cdkDropListData]="trans" class="equation-list"
       cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
 
-      <div class="matrixContainer" *ngFor="let item of transformations, let i = index" cdkDrag
+      <div class="matrixContainer" *ngFor="let item of trans, let i = index" cdkDrag
         [class.selected]="selectedIndex === i" (click)="select(i)">
         <app-add-transformations class="addBefore" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
         <div class="dragHandle example-handle" cdkDragHandle [class.hidden]="selectedIndex !== i">
