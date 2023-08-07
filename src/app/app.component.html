@@ -19,7 +19,7 @@
             <mat-icon>delete</mat-icon>
           </button>
         </div>
-        <div class="matrixContent">{{item}}</div>
+        <app-matrix class="matrixContent" [matrixItem]="item" (matrix)="setMatrixAt($event, i)"/>
         <app-add-transformations class="addAfter" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)"/>
       </div>
     </div>

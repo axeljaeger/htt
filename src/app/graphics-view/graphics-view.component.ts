@@ -99,20 +99,29 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
 
     console.log(this.matrices);
 
-    const matrixBuffer = new Float32Array(indices.length * this.matrices.length * MAT4_ELEMENT_COUNT);
     
-    this.matrices.forEach((matrix, matrixIndex) => {
+
+    let matrixAcc = Matrix.Identity();
+
+    const matricesIncludingStart = [Matrix.Identity(), ...this.matrices];
+
+    const matrixBuffer = new Float32Array(indices.length * matricesIncludingStart.length * MAT4_ELEMENT_COUNT);
+
+
+    matricesIncludingStart.forEach((matrix, matrixIndex) => {
+      console.log(matrix);
+      matrixAcc = matrix.multiply(matrixAcc);
+
       indices.forEach((pair, vertexIndex) => {
-        console.log(matrix);
-        const transformed = pair.map((index) => Vector2.Transform(points[index], matrix));
+        const width = (matrixIndex === 0 || matrixIndex === matricesIncludingStart.length -1) ? 0.05 : 0.01;
+        const transformed = pair.map((index) => Vector2.Transform(points[index], matrixAcc));
         const result = transformationFromPoints(transformed[0], transformed[1]);
-        const scalingMatrix = Matrix.Scaling(result.scale, 0.01, 1);
+        const scalingMatrix = Matrix.Scaling(result.scale, width, 1);
         const rotationMatrix = Matrix.RotationZ(result.rotation);
         const translationMatrix = Matrix.Translation(result.centerx, result.centery, 0);
         const matrix2 = scalingMatrix.multiply(rotationMatrix.multiply(translationMatrix));
         
         const matrixOffset = (matrixIndex * indices.length * MAT4_ELEMENT_COUNT)  +  vertexIndex * MAT4_ELEMENT_COUNT
-
         matrix2.copyToArray(matrixBuffer, matrixOffset);
       });
     });
@@ -138,6 +147,7 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
         this.scene.render();
       });
     });
+    this.resize();
   }
 
   createScene() {    

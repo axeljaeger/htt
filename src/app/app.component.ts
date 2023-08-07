@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 
-import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  DragDropModule,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NgFor, NgClass, NgIf, AsyncPipe } from '@angular/common';
@@ -11,11 +15,13 @@ import {
 import { GraphicsViewComponent } from './graphics-view/graphics-view.component';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { BehaviorSubject, map } from 'rxjs';
+import { MatrixComponent } from './matrix/matrix.component';
 
-interface TransformationEntry {
+export interface TransformationEntry {
   transformationType: TransformationType;
+  matrix: Matrix;
+  uuid: string;
 }
-
 
 @Component({
   selector: 'app-root',
@@ -31,24 +37,33 @@ interface TransformationEntry {
     NgIf,
     AsyncPipe,
     AddTransformationsComponent,
-    GraphicsViewComponent
+    GraphicsViewComponent,
+    MatrixComponent,
   ],
 })
 export class AppComponent {
-
   addTransformation(transformationType: TransformationType, index: number) {
     const newValue = [...this.transformations.value];
-    newValue.splice(index, 0, transformationType)
+    newValue.splice(index, 0, this.initialValue(transformationType));
     this.transformations.next(newValue);
+    this.matrices.next(this.matricesForTransformations(this.transformations.value));
     this.select(index);
   }
   title = 'htt';
   selectedIndex = 0;
 
-  transformations = new BehaviorSubject<TransformationType[]>([TransformationType.Scaling]);
-  matrices = this.transformations.pipe(map((transformations) => this.generateMatrices(transformations)));
-
-  drop(event: CdkDragDrop<TransformationType[]>) {
+  transformations = new BehaviorSubject<TransformationEntry[]>([
+    {
+      transformationType: TransformationType.Scaling,
+      matrix: Matrix.Translation(2, 0, 0),
+      uuid: 'xxx'
+    },
+  ]);
+  
+  
+  matrices = new BehaviorSubject<Matrix[]>([]);
+  
+  drop(event: CdkDragDrop<TransformationEntry[]>) {
     moveItemInArray(
       event.container.data,
       event.previousIndex,
@@ -61,22 +76,50 @@ export class AppComponent {
     this.selectedIndex = index;
   }
 
-  deleteTransformation(index : number) : void {
-    this.transformations.next([...this.transformations.value].splice(index, 1));
+  deleteTransformation(index: number): void {
+    console.log(`Number of transformations before: ${this.transformations.value.length}`);
+    const val = [...this.transformations.value]
+    val.splice(index, 1);
+    this.transformations.next(val);
+    this.matrices.next(this.matricesForTransformations(this.transformations.value));
+    console.log(`Number of transformations after: ${this.transformations.value.length}`);
+
   }
 
-  generateMatrices(transformations : TransformationType[]) : Matrix[] {
-    return transformations.map((transformation) => {
+  setMatrixAt(matrix: Matrix, index: number): void {
+    // BAD: Directly manipulating value, but here on purpose.
+    // this.transformations.value[index] = { ...this.transformations.value[index], matrix };
+    const newMatrices = [...this.matrices.value]
+    newMatrices[index] = matrix;
+    this.matrices.next(newMatrices);
+  }
+
+  initialValue(transformationType: TransformationType): TransformationEntry {
+    const matrix = ((transformation) => {
       switch (transformation) {
-        case TransformationType.Rotation: 
+        case TransformationType.Rotation:
           return Matrix.RotationZ(Math.PI / 2.0);
         case TransformationType.Translation:
-          return Matrix.Translation(1,1,0);
+          return Matrix.Translation(1, 1, 0);
         case TransformationType.Scaling:
-          return Matrix.Scaling(2,2,2);
+          return Matrix.Scaling(2, 2, 2);
         case TransformationType.Shearing:
-          return Matrix.Scaling(2,2,2);
+          return Matrix.Scaling(2, 2, 2);
       }
-    })
+    })(transformationType);
+
+    return {
+      transformationType,
+      matrix,
+      uuid: `${Math.random}`
+    };
+  }
+
+  matricesForTransformations(transformations: TransformationEntry[]) : Matrix[] {
+    return transformations.map((trans) => trans.matrix);
+  }
+
+  transformationByUUid(index : number, transformationEntry : TransformationEntry) : string {
+    return transformationEntry.uuid;
   }
 }
