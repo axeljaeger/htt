@@ -14,13 +14,13 @@ import {
 } from './add-transformations/add-transformations.component';
 import { GraphicsViewComponent } from './graphics-view/graphics-view.component';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
-import { BehaviorSubject, map } from 'rxjs';
 import { MatrixComponent } from './matrix/matrix.component';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { map } from 'rxjs/operators';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
   matrix: Matrix;
-  uuid: string;
 }
 
 @Component({
@@ -39,33 +39,35 @@ export interface TransformationEntry {
     AddTransformationsComponent,
     GraphicsViewComponent,
     MatrixComponent,
+    ReactiveFormsModule
   ],
 })
 export class AppComponent {
-  addTransformation(transformationType: TransformationType, index: number) {
-    const newValue = [...this.transformations.value];
-    newValue.splice(index, 0, this.initialValue(transformationType));
-    this.transformations.next(newValue);
-    this.matrices.next(this.matricesForTransformations(this.transformations.value));
-    this.select(index);
-  }
+  constructor(private fb : FormBuilder) {}
   title = 'htt';
   selectedIndex = 0;
 
-  transformations = new BehaviorSubject<TransformationEntry[]>([
-    {
+  matrixArray = this.fb.array([
+    this.fb.control({
       transformationType: TransformationType.Scaling,
       matrix: Matrix.Translation(2, 0, 0),
-      uuid: 'xxx'
-    },
-  ]);
-  
-  
-  matrices = new BehaviorSubject<Matrix[]>([]);
+    } as TransformationEntry)
+  ])
+
+  matrixForm = this.fb.group({
+    matrixArray: this.matrixArray
+  });
+
+  matrices$ = this.matrixArray.valueChanges.pipe(map(entries => entries.map(entry => entry.matrix)));
+
+  addTransformation(transformationType: TransformationType, index: number) {
+    this.matrixArray.push(this.fb.control(this.initialValue(transformationType)));
+    this.select(index);
+  }
   
   drop(event: CdkDragDrop<TransformationEntry[]>) {
     moveItemInArray(
-      event.container.data,
+      this.matrixArray.controls,
       event.previousIndex,
       event.currentIndex
     );
@@ -77,21 +79,7 @@ export class AppComponent {
   }
 
   deleteTransformation(index: number): void {
-    console.log(`Number of transformations before: ${this.transformations.value.length}`);
-    const val = [...this.transformations.value]
-    val.splice(index, 1);
-    this.transformations.next(val);
-    this.matrices.next(this.matricesForTransformations(this.transformations.value));
-    console.log(`Number of transformations after: ${this.transformations.value.length}`);
-
-  }
-
-  setMatrixAt(matrix: Matrix, index: number): void {
-    // BAD: Directly manipulating value, but here on purpose.
-    // this.transformations.value[index] = { ...this.transformations.value[index], matrix };
-    const newMatrices = [...this.matrices.value]
-    newMatrices[index] = matrix;
-    this.matrices.next(newMatrices);
+    this.matrixArray.controls.splice(index, 1);
   }
 
   initialValue(transformationType: TransformationType): TransformationEntry {
@@ -111,15 +99,10 @@ export class AppComponent {
     return {
       transformationType,
       matrix,
-      uuid: `${Math.random}`
     };
   }
 
   matricesForTransformations(transformations: TransformationEntry[]) : Matrix[] {
     return transformations.map((trans) => trans.matrix);
-  }
-
-  transformationByUUid(index : number, transformationEntry : TransformationEntry) : string {
-    return transformationEntry.uuid;
   }
 }

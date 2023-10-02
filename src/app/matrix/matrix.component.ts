@@ -5,7 +5,7 @@ import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatSliderModule } from '@angular/material/slider';
 import { TransformationEntry } from '../app.component';
 import { TransformationType } from '../add-transformations/add-transformations.component';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-matrix',
@@ -13,8 +13,30 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   imports: [CommonModule, MatSliderModule, ReactiveFormsModule],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi:true,
+      useExisting: MatrixComponent
+    }
+  ]
 })
-export class MatrixComponent implements OnInit {
+export class MatrixComponent implements OnInit, ControlValueAccessor {
+  onChange = (quantity : TransformationEntry) => { };
+
+  writeValue(obj: TransformationEntry): void {
+    this.matrixItem = obj;
+  }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    // throw new Error('Method not implemented.');
+  }
+  setDisabledState?(isDisabled: boolean): void {
+    // throw new Error('Method not implemented.');
+  }
+
   ngOnInit(): void {
     this.slider.valueChanges.subscribe((val) => this.generateMatrix(val));
 
@@ -25,16 +47,19 @@ export class MatrixComponent implements OnInit {
   slider = new FormControl(0);
 
   generateMatrix(val : number): void {
+    let mat : Matrix;
     switch (this.matrixItem.transformationType) {
       case TransformationType.Translation:
-        this.matrix.emit(Matrix.Translation(val,0,0));
+        mat = Matrix.Translation(val,0,0);
         break;
       case TransformationType.Scaling:
-        this.matrix.emit(Matrix.Scaling(val,val,val));
+        mat = Matrix.Scaling(val,val,val);
         break;
       case TransformationType.Rotation:
-        this.matrix.emit(Matrix.RotationZ(val / 10.0));
+        mat = Matrix.RotationZ(val / 10.0);
         break;
     }
+    this.matrix.emit(mat);
+    this.onChange({transformationType: this.matrixItem.transformationType, matrix: mat});
   }
 }

@@ -1,14 +1,14 @@
 <div class="container">
-  <app-graphics-view class="canvas" [matrices]="matrices | async">
+  <app-graphics-view class="canvas" [matrices]="matrices$ | async">
 
   </app-graphics-view>
   <div class="equation">
     <span class="math">x' =</span>
-    
-    <div cdkDropList #doneList="cdkDropList" *ngIf="transformations | async as trans" [cdkDropListData]="trans" class="equation-list"
+    <div [formGroup]="matrixForm">
+    <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
       cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
 
-      <div class="matrixContainer" *ngFor="let item of trans, let i = index" cdkDrag
+      <div class="matrixContainer" *ngFor="let alias of matrixArray.controls; let i=index" cdkDrag
         [class.selected]="selectedIndex === i" (click)="select(i)">
         <app-add-transformations class="addBefore" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
         <div class="dragHandle example-handle" cdkDragHandle [class.hidden]="selectedIndex !== i">
@@ -19,8 +19,10 @@
             <mat-icon>delete</mat-icon>
           </button>
         </div>
-        <app-matrix class="matrixContent" [matrixItem]="item" (matrix)="setMatrixAt($event, i)"/>
-        <app-add-transformations class="addAfter" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)"/>
+        <!-- Implement KeyValueAccessor -->
+        <app-matrix class="matrixContent" [formControlName]="i" />
+        <app-add-transformations class="addAfter" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)" />
+      </div>
       </div>
     </div>
     <span class="math">* x</span>

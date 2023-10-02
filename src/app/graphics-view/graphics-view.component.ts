@@ -103,13 +103,13 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
 
     let matrixAcc = Matrix.Identity();
 
-    const matricesIncludingStart = [Matrix.Identity(), ...this.matrices];
+    const matricesIncludingStart = [Matrix.Identity(), ...this.matrices ?? []];
 
     const matrixBuffer = new Float32Array(indices.length * matricesIncludingStart.length * MAT4_ELEMENT_COUNT);
 
 
     matricesIncludingStart.forEach((matrix, matrixIndex) => {
-      console.log(matrix);
+      console.log(`Matrix #${matrixIndex}`, matrix);
       matrixAcc = matrix.multiply(matrixAcc);
 
       indices.forEach((pair, vertexIndex) => {
@@ -126,7 +126,9 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
       });
     });
     
-    if (this.matrices.length > 0) {
+    console.log(`Drawing ${matricesIncludingStart.length} lines`);
+
+    if (matricesIncludingStart.length > 0) {
       this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);
     }
   }
