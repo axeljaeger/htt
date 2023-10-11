@@ -66,11 +66,17 @@ export class AppComponent {
   }
   
   drop(event: CdkDragDrop<TransformationEntry[]>) {
-    moveItemInArray(
-      this.matrixArray.controls,
-      event.previousIndex,
-      event.currentIndex
-    );
+    // moveItemInArray(
+    //   this.matrixArray.controls,
+    //   event.previousIndex,
+    //   event.currentIndex
+    // );
+
+    const control = this.matrixArray.controls.at(event.previousIndex);
+
+    this.matrixArray.removeAt(event.previousIndex);
+    this.matrixArray.insert(event.currentIndex, control);
+
     this.select(event.currentIndex);
   }
 
