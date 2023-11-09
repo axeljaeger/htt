@@ -8,21 +8,25 @@
     <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
       cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
 
-      <div class="matrixContainer" *ngFor="let alias of matrixArray.controls; let i=index" cdkDrag
+      @for (alias of matrixArray.controls; track alias; let i = $index) {
+  <div class="matrixContainer" cdkDrag
         [class.selected]="selectedIndex === i" (click)="select(i)">
         <app-add-transformations class="addBefore" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
         <div class="dragHandle example-handle" cdkDragHandle [class.hidden]="selectedIndex !== i">
           <mat-icon>drag_indicator</mat-icon>
         </div>
         <div class="deleteArea">
-          <button mat-fab aria-label="Delete Transformation" *ngIf="selectedIndex === i" (click)="deleteTransformation(i)">
+          @if (selectedIndex === i) {
+<button mat-fab aria-label="Delete Transformation" (click)="deleteTransformation(i)">
             <mat-icon>delete</mat-icon>
           </button>
+}
         </div>
         <!-- Implement KeyValueAccessor -->
         <app-matrix class="matrixContent" [formControlName]="i" />
         <app-add-transformations class="addAfter" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)" />
       </div>
+}
       </div>
     </div>
     <span class="math">* x</span>
