@@ -28,7 +28,7 @@
     "@angular-devkit/build-angular": "^17.0.0",
     "@angular/cli": "~17.0.0",
     "@angular/compiler-cli": "^17.0.1",
-    "@babylonjs/core": "^6.25.0",
+    "@babylonjs/core": "^6.36.0",
     "@types/jasmine": "~4.3.0",
     "jasmine-core": "~4.5.0",
     "karma": "~6.4.0",
