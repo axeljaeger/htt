@@ -3,16 +3,17 @@ import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
 
-import { Engine } from '@babylonjs/core/Engines/engine';
-import { Matrix, Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
+import { Matrix, Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
+import { Mesh } from '@babylonjs/core/Meshes/mesh';
+import { VertexData } from '@babylonjs/core/Meshes/mesh.vertexData';
+import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 
 import '@babylonjs/core/Meshes/thinInstanceMesh';
-import "@babylonjs/core/Materials/standardMaterial";
+import '@babylonjs/core/Materials/standardMaterial';
 
-import { VertexData } from '@babylonjs/core/Meshes/mesh.vertexData';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
+
 
 export const uniformSquareXY = () : VertexData => {
   const positions = [-0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, 0.5, 0];
@@ -68,10 +69,10 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
     const rect = this.elRef.nativeElement.getBoundingClientRect();
     this.canvasElement.nativeElement.width = rect.width;
     this.canvasElement.nativeElement.height = rect.height;
-    this.engine.resize();
+    this.engine.resize(true);
   }
 
-  private engine: Engine;
+  private engine: WebGPUEngine;
   private scene: Scene;
 
   private lineMesh : Mesh;
@@ -134,9 +135,10 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  ngAfterViewInit(): void {
+  async ngAfterViewInit() {
     const canvas = this.canvasElement.nativeElement;
-    this.engine = new Engine(canvas, true, { stencil: true });
+    this.engine = new WebGPUEngine(canvas);
+    await this.engine.initAsync();
 
     this.scene = this.createScene();
 
