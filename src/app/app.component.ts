@@ -3,11 +3,10 @@ import { Component } from '@angular/core';
 import {
   DragDropModule,
   CdkDragDrop,
-  moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { NgFor, NgClass, NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   AddTransformationsComponent,
   TransformationType,
@@ -32,9 +31,6 @@ export interface TransformationEntry {
     DragDropModule,
     MatButtonModule,
     MatIconModule,
-    NgFor,
-    NgClass,
-    NgIf,
     AsyncPipe,
     AddTransformationsComponent,
     GraphicsViewComponent,
