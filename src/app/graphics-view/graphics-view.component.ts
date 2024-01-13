@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Host, HostListener, Input, NgZone, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
@@ -12,8 +12,6 @@ import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 
 import '@babylonjs/core/Meshes/thinInstanceMesh';
 import '@babylonjs/core/Materials/standardMaterial';
-
-
 
 export const uniformSquareXY = () : VertexData => {
   const positions = [-0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, 0.5, 0];
@@ -59,7 +57,7 @@ export const transformationFromPoints = (p1: Vector2, p2: Vector2) : LineTransfo
   templateUrl: './graphics-view.component.html',
   styleUrls: ['./graphics-view.component.css']
 })
-export class GraphicsViewComponent implements AfterViewInit, OnChanges {
+export class GraphicsViewComponent implements OnInit, OnChanges {
   @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;
   
   @Input() matrices : Array<Matrix> = []; 
@@ -101,8 +99,6 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
 
     console.log(this.matrices);
 
-    
-
     let matrixAcc = Matrix.Identity();
 
     const matricesIncludingStart = [Matrix.Identity(), ...this.matrices ?? []];
@@ -135,7 +131,7 @@ export class GraphicsViewComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  async ngAfterViewInit() {
+  async ngOnInit() {
     const canvas = this.canvasElement.nativeElement;
     this.engine = new WebGPUEngine(canvas);
     await this.engine.initAsync();
