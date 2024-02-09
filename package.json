@@ -31,7 +31,7 @@
     "@angular/compiler-cli": "^17.1.2",
     "@babylonjs/core": "^6.37.1",
     "@types/jasmine": "~4.3.0",
-    "jasmine-core": "~4.5.0",
+    "jasmine-core": "~5.1.2",
     "typescript": "^5.3.3"
   }
 }
