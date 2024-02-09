@@ -19,7 +19,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "dist/htt"
+          path: "dist/htt/browser"
 
   deploy:
     # Add a dependency to the build job
