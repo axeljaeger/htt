@@ -1,6 +1,7 @@
 :host {
-    font-style: italic;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  justify-content: center;
+  gap: 5px;
+}

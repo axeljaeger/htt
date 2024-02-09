@@ -1,34 +1,22 @@
-<div class="container">
-  <app-graphics-view class="canvas" [matrices]="matrices$ | async">
-
-  </app-graphics-view>
-  <div class="equation">
-    <span class="math">x' =</span>
-    <div [formGroup]="matrixForm">
-    <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
-      cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
-
-      @for (alias of matrixArray.controls; track alias; let i = $index) {
-  <div class="matrixContainer" cdkDrag
-        [class.selected]="selectedIndex === i" (click)="select(i)">
-        <app-add-transformations class="addBefore" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
-        <div class="dragHandle example-handle" cdkDragHandle [class.hidden]="selectedIndex !== i">
-          <mat-icon>drag_indicator</mat-icon>
-        </div>
-        <div class="deleteArea">
-          @if (selectedIndex === i) {
-<button mat-fab aria-label="Delete Transformation" (click)="deleteTransformation(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
-}
-        </div>
-        <!-- Implement KeyValueAccessor -->
-        <app-matrix class="matrixContent" [formControlName]="i" />
-        <app-add-transformations class="addAfter" [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)" />
-      </div>
-}
+<app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex" />
+<div [formGroup]="matrixForm" style="overflow-x: scroll;">
+  <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
+    cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
+    <div class="math">x' =</div>
+    @for (alias of matrixArray.controls; track alias; let i = $index) {
+      @if ($first) {
+        <app-add-transformations  [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
+      }
+    <div class="matrixContainer" cdkDrag
+      [class.selected]="selectedIndex === i" (mousedown)="select(i)">
+      <div class="dragHandle example-handle" cdkDragHandle></div>
+      <app-matrix [formControlName]="i" />
+      <div class="deleteArea" (click)="deleteTransformation(i)">
+        <mat-icon class="deleteIcon">delete</mat-icon>
       </div>
     </div>
-    <span class="math">* x</span>
+    <app-add-transformations  [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)" />
+    }
+    <div class="math">* x</div>
   </div>
 </div>

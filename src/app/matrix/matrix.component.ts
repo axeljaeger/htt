@@ -26,6 +26,8 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: TransformationEntry): void {
     this.matrixItem = obj;
+    this.slider.setValue(obj.matrix.getTranslation().x);
+    this.generateMatrix(obj.matrix.getTranslation().x);
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import {
   DragDropModule,
@@ -15,7 +15,7 @@ import { GraphicsViewComponent } from './graphics-view/graphics-view.component';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { map } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
@@ -39,14 +39,14 @@ export interface TransformationEntry {
   ],
 })
 export class AppComponent {
-  constructor(private fb : FormBuilder) {}
+  private fb = inject(FormBuilder);
   title = 'htt';
   selectedIndex = 0;
 
   matrixArray = this.fb.array([
     this.fb.control({
-      transformationType: TransformationType.Scaling,
-      matrix: Matrix.Translation(2, 0, 0),
+      transformationType: TransformationType.Translation,
+      matrix: Matrix.Translation(5, 0, 0),
     } as TransformationEntry)
   ])
 
@@ -54,7 +54,7 @@ export class AppComponent {
     matrixArray: this.matrixArray
   });
 
-  matrices$ = this.matrixArray.valueChanges.pipe(map(entries => entries.map(entry => entry.matrix)));
+  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix) ));
 
   addTransformation(transformationType: TransformationType, index: number) {
     this.matrixArray.push(this.fb.control(this.initialValue(transformationType)));
@@ -62,12 +62,6 @@ export class AppComponent {
   }
   
   drop(event: CdkDragDrop<TransformationEntry[]>) {
-    // moveItemInArray(
-    //   this.matrixArray.controls,
-    //   event.previousIndex,
-    //   event.currentIndex
-    // );
-
     const control = this.matrixArray.controls.at(event.previousIndex);
 
     this.matrixArray.removeAt(event.previousIndex);
@@ -81,7 +75,7 @@ export class AppComponent {
   }
 
   deleteTransformation(index: number): void {
-    this.matrixArray.controls.splice(index, 1);
+    this.matrixArray.removeAt(index);
   }
 
   initialValue(transformationType: TransformationType): TransformationEntry {
@@ -90,9 +84,9 @@ export class AppComponent {
         case TransformationType.Rotation:
           return Matrix.RotationZ(Math.PI / 2.0);
         case TransformationType.Translation:
-          return Matrix.Translation(1, 1, 0);
+          return Matrix.Translation(1, 0, 0);
         case TransformationType.Scaling:
-          return Matrix.Scaling(2, 2, 2);
+          return Matrix.Scaling(1, 1, 1);
         case TransformationType.Shearing:
           return Matrix.Scaling(2, 2, 2);
       }
