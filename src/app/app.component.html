@@ -1,5 +1,5 @@
 <app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex" />
-<div [formGroup]="matrixForm" style="overflow-x: scroll;">
+<div [formGroup]="matrixForm" >
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     <div class="math">x' =</div>

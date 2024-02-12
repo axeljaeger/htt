@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Build angular app app
+      - name: Build Angular app
         run: | 
           npm ci
           npx ng build --base-href https://axeljaeger.github.io/htt/

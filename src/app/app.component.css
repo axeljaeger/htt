@@ -11,9 +11,8 @@
 }
 
 .equation-list {
+    overflow-x: scroll;
     background-color: cadetblue;
-    align-self: center;
-    justify-content: center;
     display: flex;
     flex-direction: row;
     padding: 30px;
@@ -91,5 +90,5 @@
     font-size: xxx-large;
     font-family: math;
     display: inline-block;
-    width: 100px;
+    white-space: nowrap;
 }
