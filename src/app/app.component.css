@@ -12,6 +12,9 @@
 
 .equation-list {
     overflow-x: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d4d transparent;
+    scrollbar-gutter: stable;
     background-color: cadetblue;
     display: flex;
     flex-direction: row;
@@ -57,17 +60,17 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    background-color: azure;
+    border-radius: 15px;
 }
 
 .dragHandle {
     cursor: grab;
-    background-color: #ccc;
+    opacity: 0;
     border-radius: 15px 15px 0px 0px;
     height: 20px;
-}
-
-.dragHandle:hover {
-    background-color: #ccf;
+    transition: all 0.4s;
+    background-color: gray;
 }
 
 .deleteArea {
@@ -75,14 +78,35 @@
     border-radius: 0px 0px 15px 15px;
     cursor: pointer;
     text-align: center;
+    transition: all 0.4s;
+    opacity: 0;
 }
 
-.deleteArea:hover {
-    background-color: brown;
-}
 
 .deleteIcon {
     color: white
+}
+
+.matrixContainer:hover {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .dragHandle {
+        opacity: 1;
+    }
+
+    .dragHandle:hover {
+        background-color: #ccf;
+    }
+
+    .deleteArea {
+        opacity: 1;
+    }
+    
+    .deleteArea:hover {
+        background-color: brown;
+    }
 }
 
 .math {
@@ -92,3 +116,4 @@
     display: inline-block;
     white-space: nowrap;
 }
+

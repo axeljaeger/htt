@@ -3,5 +3,33 @@
   flex-direction: column;
   border-radius: 15px;
   justify-content: center;
-  gap: 5px;
+  background-color: aliceblue;
+  opacity: 0.33;
+
+  transition:
+    opacity 0.4s;
+
 }
+
+button {
+  border: none;
+  padding: 1em;
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+
+:host:hover {
+  opacity: 1;
+
+  button {
+    background-color: brown;
+    opacity: 1;
+  }
+
+  button:hover {
+    background-color: red;
+    visibility: visible;
+  }
+}
+
