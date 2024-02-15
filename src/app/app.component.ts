@@ -43,6 +43,8 @@ export class AppComponent {
   title = 'htt';
   selectedIndex = 0;
 
+  hoveredTransformation = -1;
+
   matrixArray = this.fb.array([
     this.fb.control({
       transformationType: TransformationType.Translation,
@@ -100,5 +102,9 @@ export class AppComponent {
 
   matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {
     return transformations.map((trans) => trans.matrix);
+  }
+
+  hoverTransformation(event: number) {
+    this.hoveredTransformation = event;
   }
 }

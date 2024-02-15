@@ -1,21 +1,24 @@
-<app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex" />
-<div [formGroup]="matrixForm" >
+<app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex"
+  [hoveredTransformation]="hoveredTransformation" />
+<div [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     <div class="math" style="margin-left: auto;">x' =</div>
     @for (alias of matrixArray.controls; track alias; let i = $index) {
-      @if ($first) {
-        <app-add-transformations [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i)"/>
-      }
-    <div class="matrixContainer" cdkDrag
-      [class.selected]="selectedIndex === i" (mousedown)="select(i)">
+    @if ($first) {
+    <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
+      (mouseout)="hoverTransformation(-1)" />
+    }
+    <div class="matrixContainer" cdkDrag [class.selected]="selectedIndex === i" (mouseover)="select(i)"
+      (mouseout)="select(-1)">
       <div class="dragHandle example-handle" cdkDragHandle></div>
       <app-matrix [formControlName]="i" />
       <div class="deleteArea" (click)="deleteTransformation(i)">
         <mat-icon class="deleteIcon">delete</mat-icon>
       </div>
     </div>
-    <app-add-transformations [class.hidden]="selectedIndex !== i" (addTransformation)="addTransformation($event,i+1)" />
+    <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverTransformation(i+1)"
+      (mouseout)="hoverTransformation(-1)" />
     }
     <div class="math" style="margin-right: auto;">* x</div>
   </div>

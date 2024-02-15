@@ -60,6 +60,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
   @Input() matrices: Array<Matrix> = [];
   @Input() selectedIndex = -1;
+  @Input() hoveredTransformation = -1;
   camera: FreeCamera;
 
   @HostListener('window:resize')
@@ -114,8 +115,8 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       acc.matrixAcc = matrix.multiply(acc.matrixAcc);
       acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
 
-      ((matrixIndex > 0 && matrixIndex < matricesIncludingStart.length - 1) ?
-        intermediateColor : startStopColor).toArray(acc.colorBuffer, matrixIndex * 4);
+      ((matrixIndex === 0 || matrixIndex === matricesIncludingStart.length - 1 || this.hoveredTransformation === matrixIndex) ?
+        startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);
 
       if (matrixIndex !== 0) {
         acc.lines.push(...points.flat().map(point => [
