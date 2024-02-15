@@ -16,6 +16,7 @@ import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha"
+import { Engine } from '@babylonjs/core/Engines/engine';
 
 const MAT4_ELEMENT_COUNT = 16;
 
@@ -138,6 +139,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       this.lineMesh.thinInstanceSetBuffer('color', colorBuffer, 4);
     }
 
+    this.transformationMesh?.dispose();
     this.transformationMesh = CreateLineSystem("transformation-lines", {
       lines: visualData.lines,
       colors: visualData.lineColors
@@ -152,7 +154,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     this.createScene();
 
-    this.lineMesh = CreateLineSystem('location-selection', { lines: smiley }, this.scene);
+    this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);
 
     this.rebuildMatrixBuffer(smiley);
 
@@ -172,6 +174,24 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.camera.setTarget(Vector3.Zero());
 
     this.camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+
+    this.engine.setDepthFunction(Engine.ALWAYS);
+
+    const renderingOrder = [
+      'transformation-lines',
+      'picture',
+    ];
+
+    this.scene.setRenderingOrder(0, undefined,
+      undefined,
+      (meshA, meshB) => {
+        const indexA = renderingOrder.indexOf(meshA.getMesh().name);
+        const indexB = renderingOrder.indexOf(meshB.getMesh().name);
+        if (indexA === indexB) return 0
+        else if (indexA > indexB) return 1
+        else return -1
+      }
+    );
 
     //this.camera.attachControl(this.canvasElement.nativeElement, true);
     const light = new HemisphericLight("light",
