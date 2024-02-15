@@ -19,11 +19,32 @@ import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha"
 
 const MAT4_ELEMENT_COUNT = 16;
 
-const points = [
-  new Vector3(0,0,0),
-  new Vector3(1,0,0),
-  new Vector3(1,1,0), 
-  new Vector3(0,0,0),
+// const points = [
+//   new Vector3(0, 0, 0),
+//   new Vector3(1, 0, 0),
+//   new Vector3(1, 1, 0),
+//   new Vector3(0, 0, 0),
+// ];
+
+const circleRes = 20;
+
+const circle = new Array(circleRes + 1).fill(0).map((val, index) => {
+  const phi = index * 2 * Math.PI / circleRes;
+  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)
+});
+
+const mouth = new Array(circleRes + 1).fill(0).map((val, index) => {
+  const minPhi = -Math.PI / 4;
+  const maxPhi = -3 * Math.PI / 4;
+  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);
+  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)
+});
+
+const smiley = [
+  circle,
+  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),
+  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),
+  mouth
 ];
 
 @Component({
@@ -35,13 +56,13 @@ const points = [
 })
 export class GraphicsViewComponent implements OnInit, OnChanges {
   @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;
-  
-  @Input() matrices : Array<Matrix> = []; 
+
+  @Input() matrices: Array<Matrix> = [];
   @Input() selectedIndex = -1;
   camera: FreeCamera;
 
   @HostListener('window:resize')
-  resize() : void  {
+  resize(): void {
     const rect = this.elRef.nativeElement.getBoundingClientRect();
     this.canvasElement.nativeElement.width = rect.width;
     this.canvasElement.nativeElement.height = rect.height;
@@ -59,18 +80,18 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private engine: WebGPUEngine;
   private scene: Scene;
 
-  private lineMesh : Mesh;
-  private transformationMesh : Mesh;
+  private lineMesh: Mesh;
+  private transformationMesh: Mesh;
 
-  constructor(private ngZone : NgZone, private elRef:ElementRef) {}
-  
+  constructor(private ngZone: NgZone, private elRef: ElementRef) { }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (this.lineMesh) {
-      this.rebuildMatrixBuffer();
+      this.rebuildMatrixBuffer(smiley);
     }
   }
 
-  rebuildMatrixBuffer() {
+  rebuildMatrixBuffer(points: Vector3[][]) {
     if (!this.lineMesh) {
       return;
     }
@@ -81,7 +102,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     const intermediateColor = Color4.FromColor3(Color3.Gray());
 
     const matricesIncludingStart = [Matrix.Identity(), ...this.matrices ?? []];
-  
+
     const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);
     const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);
 
@@ -92,27 +113,25 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       acc.matrixAcc = matrix.multiply(acc.matrixAcc);
       acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
 
-      ((matrixIndex > 0 && matrixIndex < matricesIncludingStart.length-1) ?
-      intermediateColor : startStopColor).toArray(acc.colorBuffer, matrixIndex * 4);
-      
+      ((matrixIndex > 0 && matrixIndex < matricesIncludingStart.length - 1) ?
+        intermediateColor : startStopColor).toArray(acc.colorBuffer, matrixIndex * 4);
+
       if (matrixIndex !== 0) {
-        acc.lines.push(...points.map(point => [
+        acc.lines.push(...points.flat().map(point => [
           Vector3.TransformCoordinates(point, previousMatrix),
           Vector3.TransformCoordinates(point, acc.matrixAcc),
         ]))
-        const color = Color4.FromColor3(this.selectedIndex === matrixIndex-1 ? Color3.Blue() : Color3.Gray());
-        acc.lineColors.push(...points.map(point => [color, color]));        
+        const color = Color4.FromColor3(this.selectedIndex === matrixIndex - 1 ? Color3.Blue() : Color3.Gray());
+        acc.lineColors.push(...points.flat().map(point => [color, color]));
       }
       return acc
     }, {
-      matrixAcc : Matrix.Identity(), 
+      matrixAcc: Matrix.Identity(),
       matrixBuffer,
       colorBuffer,
       lines: [new Array<Vector3>()],
       lineColors: [new Array<Color4>()]
     });
-    
-    
 
     if (matricesIncludingStart.length > 0) {
       this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);
@@ -133,9 +152,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     this.createScene();
 
-    this.lineMesh = CreateLineSystem('location-selection', { lines: [points] }, this.scene);
+    this.lineMesh = CreateLineSystem('location-selection', { lines: smiley }, this.scene);
 
-    this.rebuildMatrixBuffer();
+    this.rebuildMatrixBuffer(smiley);
 
     this.ngZone.runOutsideAngular(() => {
       this.engine.runRenderLoop(() => {
@@ -145,19 +164,19 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.resize();
   }
 
-  createScene() {    
+  createScene() {
     this.scene = new Scene(this.engine);
-    this.camera = new FreeCamera("camera1", 
-        new Vector3(0, 0, -10), 
-        this.scene);
+    this.camera = new FreeCamera("camera1",
+      new Vector3(0, 0, -10),
+      this.scene);
     this.camera.setTarget(Vector3.Zero());
 
     this.camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
-  
+
     //this.camera.attachControl(this.canvasElement.nativeElement, true);
-    const light = new HemisphericLight("light", 
-        new Vector3(0, 1, 0), 
-        this.scene);
+    const light = new HemisphericLight("light",
+      new Vector3(0, 1, 0),
+      this.scene);
     light.intensity = 0.7;
     return this.scene;
   }
