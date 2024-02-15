@@ -54,13 +54,13 @@ export class AppComponent {
     matrixArray: this.matrixArray
   });
 
-  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix) ));
+  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));
 
   addTransformation(transformationType: TransformationType, index: number) {
-    this.matrixArray.push(this.fb.control(this.initialValue(transformationType)));
+    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
     this.select(index);
   }
-  
+
   drop(event: CdkDragDrop<TransformationEntry[]>) {
     const control = this.matrixArray.controls.at(event.previousIndex);
 
@@ -98,7 +98,7 @@ export class AppComponent {
     };
   }
 
-  matricesForTransformations(transformations: TransformationEntry[]) : Matrix[] {
+  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {
     return transformations.map((trans) => trans.matrix);
   }
 }
