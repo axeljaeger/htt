@@ -29,7 +29,7 @@
     "@angular-devkit/build-angular": "^17.1.2",
     "@angular/cli": "~17.1.2",
     "@angular/compiler-cli": "^17.1.2",
-    "@babylonjs/core": "^6.37.1",
+    "@babylonjs/core": "^6.46.1",
     "@types/jasmine": "~4.3.0",
     "jasmine-core": "~4.5.0",
     "typescript": "^5.3.3"
