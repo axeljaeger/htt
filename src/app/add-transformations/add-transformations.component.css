@@ -1,6 +1,6 @@
 :host {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   border-radius: 15px;
   justify-content: center;
   background-color: aliceblue;
@@ -17,6 +17,12 @@ button {
   opacity: 0;
   cursor: pointer;
   transition: all 0.4s;
+}
+
+div.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 :host:hover {

@@ -1,4 +1,6 @@
-<button aria-label="Add rotation" (click)="addTransformation.next(TransformationType.Rotation); $event.stopPropagation()">
+<ng-content select="[before]" />
+<div class="button-container">
+  <button aria-label="Add rotation" (click)="addTransformation.next(TransformationType.Rotation); $event.stopPropagation()">
     RO
   </button>
   <button aria-label="Add translation" (click)="addTransformation.next(TransformationType.Translation); $event.stopPropagation()">
@@ -10,3 +12,5 @@
   <button aria-label="Add shear" (click)="addTransformation.next(TransformationType.Shearing); $event.stopPropagation()">
     SH
 </button>
+</div>
+<ng-content select="[after]"/>

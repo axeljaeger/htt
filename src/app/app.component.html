@@ -3,11 +3,12 @@
 <div [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
-    <div class="math" style="margin-left: auto;">x' =</div>
     @for (alias of matrixArray.controls; track alias; let i = $index) {
     @if ($first) {
     <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
-      (mouseout)="hoverTransformation(-1)" />
+      (mouseout)="hoverTransformation(-1)" >
+      <div class="math" style="margin-left: auto;" before>x' =</div>
+    </app-add-transformations>
     }
     <div class="matrixContainer" cdkDrag [class.selected]="selectedIndex === i" (mouseover)="select(i)"
       (mouseout)="select(-1)">
@@ -18,8 +19,11 @@
       </div>
     </div>
     <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverTransformation(i+1)"
-      (mouseout)="hoverTransformation(-1)" />
+      (mouseout)="hoverTransformation(-1)" >
+    @if ($last) {
+      <div class="math" style="margin-right: auto;" after>* x</div>
     }
-    <div class="math" style="margin-right: auto;">* x</div>
+    </app-add-transformations>
+    }
   </div>
 </div>
