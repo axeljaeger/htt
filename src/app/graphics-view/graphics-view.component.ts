@@ -144,8 +144,10 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.transformationMesh = CreateLineSystem("transformation-lines", {
       lines: visualData.lines,
       colors: visualData.lineColors
-    }, this.scene);
-
+    }, this.scene);    
+    this.engine.beginFrame();
+    this.scene.render();
+    this.engine.endFrame();
   }
 
   async ngOnInit() {
@@ -159,11 +161,6 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     this.rebuildMatrixBuffer(smiley);
 
-    this.ngZone.runOutsideAngular(() => {
-      this.engine.runRenderLoop(() => {
-        this.scene.render();
-      });
-    });
     this.resize();
   }
 

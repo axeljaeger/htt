@@ -1,15 +1,15 @@
 <ng-content select="[before]" />
 <div class="button-container">
-  <button aria-label="Add rotation" (click)="addTransformation.next(TransformationType.Rotation); $event.stopPropagation()">
+  <button aria-label="Add rotation" (click)="addTransformation.emit(TransformationType.Rotation); $event.stopPropagation()">
     RO
   </button>
-  <button aria-label="Add translation" (click)="addTransformation.next(TransformationType.Translation); $event.stopPropagation()">
+  <button aria-label="Add translation" (click)="addTransformation.emit(TransformationType.Translation); $event.stopPropagation()">
     TR
   </button>
-  <button aria-label="Add scaling" (click)="addTransformation.next(TransformationType.Scaling); $event.stopPropagation()">
+  <button aria-label="Add scaling" (click)="addTransformation.emit(TransformationType.Scaling); $event.stopPropagation()">
     SC
   </button>
-  <button aria-label="Add shear" (click)="addTransformation.next(TransformationType.Shearing); $event.stopPropagation()">
+  <button aria-label="Add shear" (click)="addTransformation.emit(TransformationType.Shearing); $event.stopPropagation()">
     SH
 </button>
 </div>
