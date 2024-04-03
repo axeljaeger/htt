@@ -162,6 +162,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.rebuildMatrixBuffer(smiley);
 
     this.resize();
+    this.engine.beginFrame();
+    this.scene.render();
+    this.engine.endFrame();
   }
 
   createScene() {
