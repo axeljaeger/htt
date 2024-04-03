@@ -103,22 +103,23 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     const startStopColor = Color4.FromColor3(Color3.White());
     const intermediateColor = Color4.FromColor3(Color3.Gray());
 
-    const matricesIncludingStart = [Matrix.Identity(), ...this.matrices ?? []];
+    const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];
 
     const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);
     const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);
 
     let previousMatrix = Matrix.Identity();
+    const lastIndex = matricesIncludingStart.length - 1;
 
-    const visualData = matricesIncludingStart.reduce((acc, matrix, matrixIndex) => {
+    const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {
       previousMatrix = acc.matrixAcc;
-      acc.matrixAcc = matrix.multiply(acc.matrixAcc);
+      acc.matrixAcc = acc.matrixAcc.multiply(matrix);
       acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
 
-      ((matrixIndex === 0 || matrixIndex === matricesIncludingStart.length - 1 || this.hoveredTransformation === matrixIndex) ?
+      ((matrixIndex === 0 || matrixIndex === lastIndex || this.hoveredTransformation === matrixIndex) ?
         startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);
 
-      if (matrixIndex !== 0) {
+      if (matrixIndex !== lastIndex) {
         acc.lines.push(...points.flat().map(point => [
           Vector3.TransformCoordinates(point, previousMatrix),
           Vector3.TransformCoordinates(point, acc.matrixAcc),
