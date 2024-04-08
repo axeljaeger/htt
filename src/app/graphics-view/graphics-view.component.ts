@@ -21,6 +21,8 @@ import { Engine } from '@babylonjs/core/Engines/engine';
 
 const MAT4_ELEMENT_COUNT = 16;
 
+export type Model = 'home' | 'smiley';
+
 // const points = [
 //   new Vector3(0, 0, 0),
 //   new Vector3(1, 0, 0),
@@ -49,6 +51,27 @@ const smiley = [
   mouth
 ];
 
+const home = [
+  [
+    new Vector3(0,0,0),
+    new Vector3(1,0,0),
+    new Vector3(0,1,0),
+    new Vector3(1,1,0),
+
+    new Vector3(.5,1.5,0),
+    new Vector3(0,1,0),
+    new Vector3(0,0,0),
+
+    new Vector3(1,1,0),
+    new Vector3(1,0,0),
+  ]
+]
+
+const models : Record<Model, Vector3[][]> = {
+  smiley,
+  home
+};
+
 @Component({
   selector: 'app-graphics-view',
   standalone: true,
@@ -76,12 +99,6 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
   constructor(private elRef: ElementRef) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.lineMesh) {
-      this.rebuildMatrixBuffer(smiley);
-    }
-  }
-
   @HostListener('window:resize')
   resize(): void {
     const rect = this.elRef.nativeElement.getBoundingClientRect();
@@ -96,6 +113,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.camera.orthoBottom = -5;
     this.camera.orthoLeft = -5 * aspectRatio;
     this.camera.orthoRight = 5 * aspectRatio;
+  }
+
+  private model : Model = 'smiley';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.lineMesh) {
+      this.rebuildMatrixBuffer(models[this.model]);
+    }
   }
 
   rebuildMatrixBuffer(points: Vector3[][]) {
@@ -226,5 +251,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       this.scene);
     light.intensity = 0.7;
     return this.scene;
+  }
+
+  setModel(model: Model) {
+    
+    this.model = model;
+    this.lineMesh?.dispose();
+    this.lineMesh = CreateLineSystem('picture', { lines: models[model] }, this.scene);
+
+    this.rebuildMatrixBuffer(models[model]);
   }
 }
