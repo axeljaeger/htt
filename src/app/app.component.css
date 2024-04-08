@@ -115,5 +115,7 @@
     font-family: math;
     display: inline-block;
     white-space: nowrap;
+    margin-left: 0.5ex;
+    margin-right: 0.5ex;
 }
 

@@ -7,7 +7,7 @@
     @if ($first) {
     <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
       (mouseout)="hoverTransformation(-1)" >
-      <div class="math" style="margin-left: auto;" before>x' =</div>
+      <div class="math" before>x' =</div>
     </app-add-transformations>
     }
     <div class="matrixContainer" cdkDrag [class.selected]="selectedIndex === i" (mouseover)="select(i)"
@@ -21,7 +21,7 @@
     <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverTransformation(i+1)"
       (mouseout)="hoverTransformation(-1)" >
     @if ($last) {
-      <div class="math" style="margin-right: auto;" after>* x</div>
+      <div class="math" after>* x</div>
     }
     </app-add-transformations>
     }

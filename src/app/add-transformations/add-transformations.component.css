@@ -8,7 +8,24 @@
 
   transition:
     opacity 0.4s;
+}
 
+:host:first-child {
+ button:first-child {
+  border-top-left-radius: 15px;
+ }
+ button:last-child {
+  border-bottom-left-radius: 15px;
+ }
+}
+
+:host:last-child {
+  button:first-child {
+    border-top-right-radius: 15px;
+   }
+   button:last-child {
+    border-bottom-right-radius: 15px;
+   }
 }
 
 button {
