@@ -6,6 +6,8 @@ import {
 } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';
+
 import { AsyncPipe } from '@angular/common';
 import {
   AddTransformationsComponent,
@@ -30,20 +32,29 @@ export interface TransformationEntry {
   imports: [
     DragDropModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     AsyncPipe,
     AddTransformationsComponent,
     GraphicsViewComponent,
     MatrixComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ],
 })
 export class AppComponent {
+  axesVisible : false;
+
+  setAxesVisible($event: MatButtonToggleChange) {
+  this.axesVisible = $event.value.includes('axes');
+}
   private fb = inject(FormBuilder);
   title = 'htt';
   selectedIndex = 0;
 
   hoveredTransformation = -1;
+
+
 
   matrixArray = this.fb.array([
     this.fb.control({

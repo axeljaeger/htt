@@ -1,5 +1,8 @@
 <app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex"
-  [hoveredTransformation]="hoveredTransformation" />
+  [hoveredTransformation]="hoveredTransformation" [axesVisible]="axesVisible"/>
+<mat-button-toggle-group class="viewport-options" multiple vertical (change)="setAxesVisible($event)">
+  <mat-button-toggle value="axes">AX</mat-button-toggle>
+</mat-button-toggle-group>
 <div [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">

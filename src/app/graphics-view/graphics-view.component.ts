@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, NgZone, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
@@ -14,6 +14,7 @@ import '@babylonjs/core/Materials/standardMaterial';
 import { Camera } from '@babylonjs/core/Cameras/camera';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';
+import { AxesViewer } from '@babylonjs/core/Debug/axesViewer';
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha"
 import { Engine } from '@babylonjs/core/Engines/engine';
@@ -61,7 +62,25 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   @Input() matrices: Array<Matrix> = [];
   @Input() selectedIndex = -1;
   @Input() hoveredTransformation = -1;
+  @Input() axesVisible = false;
   camera: FreeCamera;
+
+  private engine: WebGPUEngine;
+  private scene: Scene;
+
+  private lineMesh: Mesh;
+  private transformationMesh: Mesh;
+
+  private coordinateSystemMesh: AxesViewer;
+  private coordinateSystemInstances: AxesViewer[] = [];
+
+  constructor(private elRef: ElementRef) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.lineMesh) {
+      this.rebuildMatrixBuffer(smiley);
+    }
+  }
 
   @HostListener('window:resize')
   resize(): void {
@@ -79,26 +98,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.camera.orthoRight = 5 * aspectRatio;
   }
 
-  private engine: WebGPUEngine;
-  private scene: Scene;
-
-  private lineMesh: Mesh;
-  private transformationMesh: Mesh;
-
-  constructor(private ngZone: NgZone, private elRef: ElementRef) { }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.lineMesh) {
-      this.rebuildMatrixBuffer(smiley);
-    }
-  }
-
   rebuildMatrixBuffer(points: Vector3[][]) {
     if (!this.lineMesh) {
       return;
     }
 
     this.transformationMesh?.dispose();
+    this.coordinateSystemInstances.forEach(axis => axis.dispose());
+    this.coordinateSystemInstances = [];
 
     const startStopColor = Color4.FromColor3(Color3.White());
     const intermediateColor = Color4.FromColor3(Color3.Gray());
@@ -115,6 +122,17 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       previousMatrix = acc.matrixAcc;
       acc.matrixAcc = acc.matrixAcc.multiply(matrix);
       acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
+
+      const rotationMatrix = acc.matrixAcc.getRotationMatrix();
+
+      if (this.axesVisible) {
+        const axes = this.coordinateSystemMesh.createInstance();
+        const pos = Vector3.TransformCoordinates(new Vector3(0, 0, 0), acc.matrixAcc)
+        const xAxis = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);
+        const yAxis = Vector3.TransformCoordinates(new Vector3(0, 1, 0), rotationMatrix);
+        axes.update(pos, xAxis, yAxis, new Vector3(1, 1, 1));
+        this.coordinateSystemInstances.push(axes);
+      }
 
       ((matrixIndex === 0 || matrixIndex === lastIndex || this.hoveredTransformation === matrixIndex) ?
         startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);
@@ -145,7 +163,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.transformationMesh = CreateLineSystem("transformation-lines", {
       lines: visualData.lines,
       colors: visualData.lineColors
-    }, this.scene);    
+    }, this.scene);
     this.engine.beginFrame();
     this.scene.render();
     this.engine.endFrame();
@@ -159,6 +177,13 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.createScene();
 
     this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);
+
+    this.coordinateSystemMesh = new AxesViewer(this.scene);
+    this.coordinateSystemMesh.zAxis.dispose();
+    [
+      this.coordinateSystemMesh.xAxis,
+      this.coordinateSystemMesh.yAxis
+    ].forEach(mesh => mesh.setEnabled(false));
 
     this.rebuildMatrixBuffer(smiley);
 
