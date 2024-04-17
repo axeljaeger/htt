@@ -1,5 +1,9 @@
-<app-graphics-view class="canvas" [matrices]="matrices$ | async" [selectedIndex]="selectedIndex"
-  [hoveredTransformation]="hoveredTransformation" [axesVisible]="axesVisible"/>
+<app-graphics-view 
+  #graphicsView class="canvas" 
+  [matrices]="matrices$ | async" 
+  [selectedIndex]="selectedIndex"
+  [hoveredTransformation]="hoveredTransformation" 
+  [axesVisible]="axesVisible" />
 <mat-button-toggle-group class="viewport-options" multiple vertical (change)="setAxesVisible($event)">
   <mat-button-toggle value="axes">AX</mat-button-toggle>
 </mat-button-toggle-group>
@@ -9,7 +13,7 @@
     @for (alias of matrixArray.controls; track alias; let i = $index) {
     @if ($first) {
     <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
-      (mouseout)="hoverTransformation(-1)" >
+      (mouseout)="hoverTransformation(-1)">
       <div class="math" before>x' =</div>
     </app-add-transformations>
     }
@@ -22,10 +26,19 @@
       </div>
     </div>
     <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverTransformation(i+1)"
-      (mouseout)="hoverTransformation(-1)" >
-    @if ($last) {
-      <div class="math" after>* x</div>
-    }
+      (mouseout)="hoverTransformation(-1)">
+      @if ($last) {
+      <div class="math" after style="display: flex; flex-direction: row;">* x
+      <div style="display: flex; flex-direction: column;">
+        <button (click)="graphicsView.setModel('smiley')"><mat-icon>
+            sentiment_satisfied
+          </mat-icon></button>
+        <button (click)="graphicsView.setModel('home')"><mat-icon>
+            home
+          </mat-icon></button>
+        </div>
+      </div>
+      }
     </app-add-transformations>
     }
   </div>
