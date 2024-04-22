@@ -1,6 +1,35 @@
-{{ matrixItem?.transformationType }}
+<span class="header">{{ matrixItem?.transformationType }}</span>
+@switch (matrixItem?.transformationType) {
+    @case ('Translation') {
+       <ng-container [formGroup]="translation">
+        <span class="labelX">x: {{ translation.value.x }}</span>
+         <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
+             <input matSliderThumb formControlName="x">
+         </mat-slider>
+         <span class="labelY">y: {{ translation.value.y }}</span>
+         <mat-slider class="sliderY" min="-10.0" max="10.0" step="0.1" value="10">
+             <input matSliderThumb formControlName="y">
+         </mat-slider>
+       </ng-container> 
+    }
+    @case ('Scaling') {
+        <ng-container [formGroup]="scaling">
+            <span class="labelX">x: {{ scaling.value.x }}</span>
+            <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
+                <input matSliderThumb formControlName="x">
+            </mat-slider>
+            <span class="labelY">y: {{ scaling.value.y }}</span>
+            <mat-slider class="sliderY" min="-10.0" max="10.0" step="0.1" value="10">
+                <input matSliderThumb formControlName="y">
+            </mat-slider>
+        </ng-container> 
+    }
+    @case ('Rotation') {
+        <span class="labelX">{{ rotation.value | number: '1.2-2' }}</span>
+        <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
+            <input matSliderThumb [formControl]="rotation">
+        </mat-slider>
 
-<mat-slider min="-10.0" max="10.0" step="0.1" value="10">
-    <input matSliderThumb [formControl]="slider">
-</mat-slider>
-<span>{{ slider.value }}</span>
+        
+    }
+}
