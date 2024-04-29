@@ -1,35 +1,92 @@
-<span class="header">{{ matrixItem?.transformationType }}</span>
+<div class="inner">
 @switch (matrixItem?.transformationType) {
     @case ('Translation') {
        <ng-container [formGroup]="translation">
-        <span class="labelX">x: {{ translation.value.x }}</span>
-         <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
-             <input matSliderThumb formControlName="x">
-         </mat-slider>
-         <span class="labelY">y: {{ translation.value.y }}</span>
-         <mat-slider class="sliderY" min="-10.0" max="10.0" step="0.1" value="10">
-             <input matSliderThumb formControlName="y">
-         </mat-slider>
+        <span class="a11">1</span>
+        <span class="a21">0</span>
+        <span class="a31">0</span>
+        
+        <span class="a12">0</span>
+        <span class="a22">1</span>
+        <span class="a32">0</span>
+        
+        <span class="a13">{{ translation.value.x }}</span>
+        <span class="a23">{{ translation.value.y }}</span>
+        <span class="a33">1</span>
+        
+        <div class="sliders">
+            <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+                <input matSliderThumb formControlName="x">
+            </mat-slider>
+            <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+                <input matSliderThumb formControlName="y">
+            </mat-slider>
+        </div>
        </ng-container> 
     }
     @case ('Scaling') {
         <ng-container [formGroup]="scaling">
-            <span class="labelX">x: {{ scaling.value.x }}</span>
-            <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
-                <input matSliderThumb formControlName="x">
-            </mat-slider>
-            <span class="labelY">y: {{ scaling.value.y }}</span>
-            <mat-slider class="sliderY" min="-10.0" max="10.0" step="0.1" value="10">
-                <input matSliderThumb formControlName="y">
-            </mat-slider>
+            <span class="a11">{{ scaling.value.x }}</span>
+            <span class="a21">0</span>
+            <span class="a31">0</span>
+            
+            <span class="a12">0</span>
+            <span class="a22">{{ scaling.value.y }}</span>
+            <span class="a32">0</span>
+            
+            <span class="a13">0</span>
+            <span class="a23">0</span>
+            <span class="a33">1</span>
+
+            <div class="sliders">
+                <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+                    <input matSliderThumb formControlName="x">
+                </mat-slider>
+                <mat-slider  min="-10.0" max="10.0" step="0.1" value="10">
+                    <input matSliderThumb formControlName="y">
+                </mat-slider>
+            </div>
         </ng-container> 
     }
     @case ('Rotation') {
-        <span class="labelX">{{ rotation.value | number: '1.2-2' }}</span>
-        <mat-slider class="sliderX" min="-10.0" max="10.0" step="0.1" value="10">
+        <span class="a11">{{ rotation.value | rotationElement: MatrixElement.a11 | number: '1.2-2' }}</span>
+        <span class="a21">{{ rotation.value | rotationElement: MatrixElement.a21 | number: '1.2-2' }}</span>
+        <span class="a31">0</span> 
+        
+        <span class="a12">{{ rotation.value | rotationElement: MatrixElement.a12 | number: '1.2-2' }}</span>
+        <span class="a22">{{ rotation.value | rotationElement: MatrixElement.a22 | number: '1.2-2' }}</span>
+        <span class="a32">0</span>
+        
+        <span class="a13">0</span>
+        <span class="a23">0</span>
+        <span class="a33">1</span>
+        <mat-slider discrete class="sliders" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
             <input matSliderThumb [formControl]="rotation">
         </mat-slider>
-
-        
+    }
+    @case ('Shearing') {
+        <ng-container [formGroup]="shearing">
+            <span class="a11">1</span>
+            <span class="a21">{{ shearing.value.y }}</span>
+            <span class="a31">0</span>
+            
+            <span class="a12">{{ shearing.value.x }}</span>
+            <span class="a22">1</span>
+            <span class="a32">0</span>
+            
+            <span class="a13">0</span>
+            <span class="a23">0</span>
+            <span class="a33">1</span>
+            
+            <div class="sliders">
+                <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+                    <input matSliderThumb formControlName="x">
+                </mat-slider>
+                <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+                    <input matSliderThumb formControlName="y">
+                </mat-slider>
+            </div>
+           </ng-container> 
     }
 }
+</div>
