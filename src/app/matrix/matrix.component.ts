@@ -1,19 +1,26 @@
-import { Component, Input, OnInit, Output, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Output, Pipe, PipeTransform } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
 import { MatSliderModule } from '@angular/material/slider';
 import { TransformationEntry } from '../app.component';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { map } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { map, startWith, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, merge } from 'rxjs';
 import { Angle } from '@babylonjs/core/Maths/math.path';
+import { LetDirective } from '@ngrx/component';
+
 
 enum MatrixElement {
   a11 = 'a11',
   a21 = 'a21',
   a12 = 'a12',
   a22 = 'a22'
+}
+
+enum Dimension {
+  x,
+  y
 }
 
 @Pipe({
@@ -38,7 +45,7 @@ export class RotationMatrixElementPipe implements PipeTransform {
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, RotationMatrixElementPipe],
+  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, RotationMatrixElementPipe, LetDirective],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.css'],
   providers: [
@@ -47,12 +54,16 @@ export class RotationMatrixElementPipe implements PipeTransform {
       multi:true,
       useExisting: MatrixComponent
     }
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatrixComponent implements OnInit, ControlValueAccessor {
   @Input() matrixItem: TransformationEntry;
 
   public MatrixElement = MatrixElement;
+  public Dimension = Dimension;
+
+  affectedDimensions$ = new BehaviorSubject<Dimension[]>([Dimension.x]);
 
   rotation = new FormControl(0);
 
@@ -63,7 +74,6 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   translation = new FormGroup({
     x: new FormControl(0),
-    y: new FormControl(0) 
   })
 
   shearing = new FormGroup({
@@ -71,8 +81,26 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
     y: new FormControl(0) 
   })
   
-  rotation$ = this.rotation.valueChanges.pipe(map(number => Matrix.RotationZ(number)));
-  translation$ = this.translation.valueChanges.pipe(map(({x,y}) => Matrix.Translation(x,y,0)));
+  rotation$ = this.rotation.valueChanges.pipe(map(number => Matrix.RotationZ(Angle.FromDegrees(number).radians())));
+  
+  // combineLatest with affectedDimensions
+
+  prevMatrix = Matrix.Identity();
+
+  translation$ = combineLatest(
+    [ this.translation.valueChanges, 
+      this.affectedDimensions$
+    ]
+  ).pipe(
+    map(([{x}, dimensions]) => {
+      const tx = dimensions.includes(Dimension.x) ? x : this.prevMatrix.getTranslation().x;
+      const ty = dimensions.includes(Dimension.y) ? x : this.prevMatrix.getTranslation().y;
+      console.log(dimensions, this.prevMatrix);
+      const newMatrix = Matrix.Translation(tx,ty,0);
+      this.prevMatrix = newMatrix
+      return newMatrix;
+    }));
+  
   scaling$ = this.scaling.valueChanges.pipe(map(({x,y}) => Matrix.Scaling(x,y,0)));
   shearing$ = this.shearing.valueChanges.pipe(map(({x,y}) => {
     const matrix = Matrix.Identity();
@@ -81,9 +109,22 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
     return matrix;
   }));
   
-  @Output() matrix = merge(this.rotation$, this.translation$, this.scaling$, this.shearing$);
+  @Output() matrix = merge(this.rotation$, this.translation$, this.scaling$, this.shearing$).pipe(startWith(Matrix.Identity()));
+
+
+  clickAffectedDimension(dimension: Dimension, event: MouseEvent) {
+    const affectedDimensions = this.affectedDimensions$.value;
+    if (affectedDimensions.includes(dimension)) {
+      this.affectedDimensions$.next(affectedDimensions.filter(d => d !== dimension));
+    } else {
+      this.affectedDimensions$.next([...affectedDimensions, dimension]);
+    }
+  }
 
   onChange = (quantity : TransformationEntry) => { };
+  formatRotationLabel(value: number): string {
+      return `${value}°`;
+  }
 
   writeValue(obj: TransformationEntry): void {
     this.matrixItem = obj;
@@ -102,7 +143,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
       case 'Translation': {
         const x = obj.matrix.getRow(3).x;
         const y = obj.matrix.getRow(3).y;
-        this.translation.patchValue({ x, y }, { emitEvent: false });
+        this.translation.patchValue({ x }, { emitEvent: false });
       } break;
       case 'Shearing': {
         const x = obj.matrix.getRow(0).y;
