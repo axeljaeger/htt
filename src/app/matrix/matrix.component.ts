@@ -9,6 +9,8 @@ import { map, startWith, withLatestFrom } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, merge } from 'rxjs';
 import { Angle } from '@babylonjs/core/Maths/math.path';
 import { LetDirective } from '@ngrx/component';
+import { MatIconModule } from '@angular/material/icon';
+import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 
 
 enum MatrixElement {
@@ -23,29 +25,11 @@ enum Dimension {
   y
 }
 
-@Pipe({
-  standalone: true,
-  name: 'rotationElement'
-})
-export class RotationMatrixElementPipe implements PipeTransform {
-  transform(rotationDeg: number, element : MatrixElement): number {
-    switch (element) {
-      case MatrixElement.a11:
-        return Math.cos(rotationDeg * Math.PI / 180);
-      case MatrixElement.a21:
-        return Math.sin(rotationDeg * Math.PI / 180);
-      case MatrixElement.a12:
-        return -Math.sin(rotationDeg * Math.PI / 180);
-      case MatrixElement.a22:
-        return Math.cos(rotationDeg * Math.PI / 180);
-    }
-  }
-}
-
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, RotationMatrixElementPipe, LetDirective],
+  hostDirectives: [CdkDrag],
+  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.css'],
   providers: [
@@ -65,53 +49,58 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   affectedDimensions$ = new BehaviorSubject<Dimension[]>([Dimension.x]);
 
-  rotation = new FormControl(0);
+  slider = new FormControl(0);
 
-  scaling = new FormGroup({
-    x: new FormControl(0),
-    y: new FormControl(0)
-  })
-
-  translation = new FormGroup({
-    x: new FormControl(0),
-  })
-
-  shearing = new FormGroup({
-    x: new FormControl(0),
-    y: new FormControl(0) 
-  })
-  
-  rotation$ = this.rotation.valueChanges.pipe(map(number => Matrix.RotationZ(Angle.FromDegrees(number).radians())));
-  
   // combineLatest with affectedDimensions
 
   prevMatrix = Matrix.Identity();
 
-  translation$ = combineLatest(
-    [ this.translation.valueChanges, 
+  @Output() matrix = combineLatest(
+    [ this.slider.valueChanges, 
       this.affectedDimensions$
     ]
   ).pipe(
-    map(([{x}, dimensions]) => {
-      const tx = dimensions.includes(Dimension.x) ? x : this.prevMatrix.getTranslation().x;
-      const ty = dimensions.includes(Dimension.y) ? x : this.prevMatrix.getTranslation().y;
-      console.log(dimensions, this.prevMatrix);
-      const newMatrix = Matrix.Translation(tx,ty,0);
-      this.prevMatrix = newMatrix
-      return newMatrix;
-    }));
-  
-  scaling$ = this.scaling.valueChanges.pipe(map(({x,y}) => Matrix.Scaling(x,y,0)));
-  shearing$ = this.shearing.valueChanges.pipe(map(({x,y}) => {
-    const matrix = Matrix.Identity();
-    matrix.setRowFromFloats(0, 1, x, 0, 0);
-    matrix.setRowFromFloats(1, y, 1, 0, 0);
-    return matrix;
-  }));
-  
-  @Output() matrix = merge(this.rotation$, this.translation$, this.scaling$, this.shearing$).pipe(startWith(Matrix.Identity()));
+    map(([slider, dimensions]) => {
+      switch (this.matrixItem.transformationType) {
+        case 'Translation': {
+          const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;
+          const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;
+          const newMatrix = Matrix.Translation(tx,ty,0);
+          this.prevMatrix = newMatrix
+          return newMatrix;
+        };
 
+        case 'Rotation': {
+          return Matrix.RotationZ(Angle.FromDegrees(slider).radians())
+        };
 
+        case 'Scaling': {
+          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).x;
+          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).y;
+
+          const newMatrix = Matrix.Scaling(sx,sy,0);
+          this.prevMatrix = newMatrix
+
+          return newMatrix;
+        };
+
+        case 'Shearing': {
+          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).y;
+          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).x;
+
+          const newMatrix = Matrix.Identity();
+          newMatrix.setRowFromFloats(0, 1, sx, 0, 0);
+          newMatrix.setRowFromFloats(1, sy, 1, 0, 0);
+          this.prevMatrix = newMatrix
+          return newMatrix;
+        };
+
+        default:
+          return Matrix.Identity();
+      }
+    })).pipe(startWith(Matrix.Identity()));
+  
+  
   clickAffectedDimension(dimension: Dimension, event: MouseEvent) {
     const affectedDimensions = this.affectedDimensions$.value;
     if (affectedDimensions.includes(dimension)) {
@@ -133,22 +122,22 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
         const rotationMatrix = obj.matrix.getRotationMatrix();
         const r11 = rotationMatrix.getRow(0).x;
         const r21 = rotationMatrix.getRow(1).x
-        this.rotation.setValue(Angle.FromRadians( Math.atan2(r21, r11)).degrees(), { emitEvent: false });
+        this.slider.setValue(Angle.FromRadians( Math.atan2(r21, r11)).degrees(), { emitEvent: false });
       } break;
       case 'Scaling': {
         const x = obj.matrix.getRow(0).x;
         const y = obj.matrix.getRow(1).y;
-        this.scaling.patchValue({ x, y }, { emitEvent: false });
+        this.slider.patchValue(x, { emitEvent: false });
       } break;
       case 'Translation': {
         const x = obj.matrix.getRow(3).x;
         const y = obj.matrix.getRow(3).y;
-        this.translation.patchValue({ x }, { emitEvent: false });
+        this.slider.patchValue(x , { emitEvent: false });
       } break;
       case 'Shearing': {
         const x = obj.matrix.getRow(0).y;
         const y = obj.matrix.getRow(1).x;
-        this.shearing.patchValue({ x, y }, { emitEvent: false });
+        this.slider.patchValue(x, { emitEvent: false });
       } break;
     }
   }

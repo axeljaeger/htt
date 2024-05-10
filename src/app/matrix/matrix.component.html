@@ -1,96 +1,77 @@
-<div class="inner" *ngrxLet="{
-    dimensions: affectedDimensions$,
-    m: matrix,
-    } as shared">
-    @switch (matrixItem?.transformationType) {
-        @case ('Translation') {
-            <ng-container [formGroup]="translation">
-            <span class="header">Translation</span>
+<div class="header">
+    <div class="dragHandle" cdkDragHandle>{{matrixItem.transformationType}}</div>
+    <div class="deleteArea" >
+      <mat-icon class="deleteIcon">delete</mat-icon>
+    </div>
+  </div>
 
-            <span class="a11">1</span>
-            <span class="a21">0</span>
-            <span class="a31">0</span>
-            
-            <span class="a12">0</span>
-            <span class="a22">1</span>
-            <span class="a32">0</span>
-            
-            <span class="a13" class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getTranslation().x | number: '1.2-2' }}</span>
-            <span class="a23" class="highlight" [class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getTranslation().y | number: '1.2-2' }}</span>
-            <span class="a33">1</span>
-            
-            <div class="sliders">
-                <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
-                    <input matSliderThumb formControlName="x">
-                </mat-slider>
-            </div>
-            </ng-container> 
+<div class="outer">
+    <div class="inner" *ngrxLet="{
+        dimensions: affectedDimensions$,
+        m: matrix,
+        } as shared">
+        @switch (matrixItem?.transformationType) {
+            @case ('Translation') {
+                <span>1</span>
+                <span>0</span>
+                <span>0</span>
+                <span>0</span>
+                <span>1</span>
+                <span>0</span>
+                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getTranslation().x | number: '1.2-2' }}</span>
+                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getTranslation().y | number: '1.2-2' }}</span>
+                <span>1</span>
+            }
+            @case ('Scaling') {
+                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>
+                <span>0</span>
+                <span>0</span>
+
+                <span>0</span>
+                <span class="highlight"[class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>
+                <span>0</span>
+                
+                <span>0</span>
+                <span>0</span>
+                <span>1</span>
+            }
+            @case ('Rotation') {
+                <span class="highlight">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>
+                <span class="highlight">{{ shared.m.getRow(0).y | number: '1.2-2' }}</span>
+                <span>0</span> 
+                
+                <span class="highlight">{{ shared.m.getRow(1).x | number: '1.2-2' }}</span>
+                <span class="highlight">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>
+                <span>0</span>
+                
+                <span>0</span>
+                <span>0</span>
+                <span>1</span>
+            }
+            @case ('Shearing') {
+                <span>1</span>
+                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getRow(0).y | number: '1.2-2'}}</span>
+                <span>0</span>
+                
+                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getRow(1).x | number: '1.2-2'}}</span>
+                <span>1</span>
+                <span>0</span>
+                
+                <span>0</span>
+                <span>1</span>
+                <span>0</span>
+            }
         }
-        @case ('Scaling') {
-            <ng-container [formGroup]="scaling">
-                <span class="header">Scaling</span>
-                <span class="a11" class="highlight">{{ scaling.value.x }}</span>
-                <span class="a21">0</span>
-                <span class="a31">0</span>
-                
-                <span class="a12">0</span>
-                <span class="a22" class="highlight">{{ scaling.value.y }}</span>
-                <span class="a32">0</span>
-                
-                <span class="a13">0</span>
-                <span class="a23">0</span>
-                <span class="a33">1</span>
-    
-                <div class="sliders">
-                    <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
-                        <input matSliderThumb formControlName="x">
-                    </mat-slider>
-                    <mat-slider  min="-10.0" max="10.0" step="0.1" value="10">
-                        <input matSliderThumb formControlName="y">
-                    </mat-slider>
-                </div>
-            </ng-container> 
-        }
-        @case ('Rotation') {
-            <span class="header">Rotation</span>
-            <span class="a11" class="highlight">{{ rotation.value | rotationElement: MatrixElement.a11 | number: '1.2-2' }}</span>
-            <span class="a21" class="highlight">{{ rotation.value | rotationElement: MatrixElement.a21 | number: '1.2-2' }}</span>
-            <span class="a31">0</span> 
-            
-            <span class="a12" class="highlight">{{ rotation.value | rotationElement: MatrixElement.a12 | number: '1.2-2' }}</span>
-            <span class="a22" class="highlight">{{ rotation.value | rotationElement: MatrixElement.a22 | number: '1.2-2' }}</span>
-            <span class="a32">0</span>
-            
-            <span class="a13">0</span>
-            <span class="a23">0</span>
-            <span class="a33">1</span>
-            <mat-slider discrete [displayWith]="formatRotationLabel" class="sliders" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
-                <input matSliderThumb [formControl]="rotation">
-            </mat-slider>
-        }
-        @case ('Shearing') {
-            <ng-container [formGroup]="shearing">
-                <span class="a11">1</span>
-                <span class="a21" class="highlight">{{ shearing.value.y }}</span>
-                <span class="a31">0</span>
-                
-                <span class="a12" class="highlight">{{ shearing.value.x }}</span>
-                <span class="a22">1</span>
-                <span class="a32">0</span>
-                
-                <span class="a13">0</span>
-                <span class="a23">0</span>
-                <span class="a33">1</span>
-                
-                <div class="sliders">
-                    <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
-                        <input matSliderThumb formControlName="x">
-                    </mat-slider>
-                    <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
-                        <input matSliderThumb formControlName="y">
-                    </mat-slider>
-                </div>
-                </ng-container> 
-        }
-    }
-    </div>        
+        </div>    
+
+</div>
+
+@if (matrixItem?.transformationType === 'Rotation') {
+    <mat-slider discrete [displayWith]="formatRotationLabel" class="sliders" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
+        <input matSliderThumb [formControl]="slider">
+    </mat-slider>
+} @else {
+    <mat-slider min="-10.0" max="10.0" step="0.1" value="10">
+        <input matSliderThumb [formControl]="slider">
+    </mat-slider>
+}

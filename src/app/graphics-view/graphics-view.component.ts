@@ -167,8 +167,12 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
           Vector3.TransformCoordinates(point, previousMatrix),
           Vector3.TransformCoordinates(point, acc.matrixAcc),
         ]))
-        const color = Color4.FromColor3(this.selectedIndex === matrixIndex - 1 ? Color3.Blue() : Color3.Gray());
-        acc.lineColors.push(...points.flat().map(point => [color, color]));
+      
+        const selected = this.selectedIndex === matrixIndex -1;
+        const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());
+        const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());
+        
+        acc.lineColors.push(...points.flat().map(point => [startColor, endColor]));
       }
       return acc
     }, {

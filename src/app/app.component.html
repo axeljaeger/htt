@@ -12,34 +12,28 @@
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     @for (alias of matrixArray.controls; track alias; let i = $index) {
     @if ($first) {
-    <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
-      (mouseout)="hoverTransformation(-1)">
       <div class="math" before>x' =</div>
-    </app-add-transformations>
+      <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverTransformation(i)"
+      (mouseout)="hoverTransformation(-1)" />      
     }
-    <div class="matrixContainer" cdkDrag [class.selected]="selectedIndex === i" (mouseover)="select(i)"
+      <app-matrix [formControlName]="i"  [class.selected]="selectedIndex === i" (mouseover)="select(i)"
       (mouseout)="select(-1)">
-      <div class="dragHandle example-handle" cdkDragHandle></div>
-      <app-matrix [formControlName]="i" />
-      <div class="deleteArea" (click)="deleteTransformation(i)">
-        <mat-icon class="deleteIcon">delete</mat-icon>
-      </div>
-    </div>
+      </app-matrix>
     <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverTransformation(i+1)"
-      (mouseout)="hoverTransformation(-1)">
+      (mouseout)="hoverTransformation(-1)" />
       @if ($last) {
-      <div class="math" after style="display: flex; flex-direction: row;">* x
-      <div style="display: flex; flex-direction: column;">
-        <button (click)="graphicsView.setModel('smiley')"><mat-icon>
+      <div class="math" after style="display: flex; flex-direction: row;">x
+        <mat-button-toggle-group vertical (change)="graphicsView.setModel($event.value)">
+          <mat-button-toggle value="smiley"><mat-icon>
             sentiment_satisfied
-          </mat-icon></button>
-        <button (click)="graphicsView.setModel('home')"><mat-icon>
+          </mat-icon></mat-button-toggle>
+          <mat-button-toggle value="home"><mat-icon>
             home
-          </mat-icon></button>
-        </div>
+          </mat-icon></mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
+
       }
-    </app-add-transformations>
     }
   </div>
 </div>
