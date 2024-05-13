@@ -1,0 +1,1759 @@
+{
+    "pipes": [],
+    "interfaces": [
+        {
+            "name": "TransformationEntry",
+            "id": "interface-TransformationEntry-f170bf10e074e94543c0ab04421560cdc612f1c5dd4ddacf689b71ae2e7dabd1baa5128823fe03312830c34aa1ac27bfe443cd5abbb85d6d69d71e37f8a2d2d5",
+            "file": "src/app/app.component.ts",
+            "deprecated": false,
+            "deprecationMessage": "",
+            "type": "interface",
+            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  selectedIndex = 0;\n\n  hoveredTransformation = -1;\n\n\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.select(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.select(event.currentIndex);\n  }\n\n  select(index: number): void {\n    this.selectedIndex = index;\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverTransformation(event: number) {\n    this.hoveredTransformation = event;\n  }\n}\n",
+            "properties": [
+                {
+                    "name": "matrix",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Matrix",
+                    "optional": false,
+                    "description": "",
+                    "line": 24
+                },
+                {
+                    "name": "transformationType",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "TransformationType",
+                    "optional": false,
+                    "description": "",
+                    "line": 23
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 171,
+            "methods": [],
+            "extends": []
+        }
+    ],
+    "injectables": [],
+    "guards": [],
+    "interceptors": [],
+    "classes": [],
+    "directives": [],
+    "components": [
+        {
+            "name": "AddTransformationsComponent",
+            "id": "component-AddTransformationsComponent-e4daa6cf737fc5a33acc8e5003cba04b65314f9ddce83f83387ad1addcf47dca907ede6d9a4e0459ad03c3a862c1a1d4887cc0b4db4e60870b297bc5f6c35102",
+            "file": "src/app/add-transformations/add-transformations.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-add-transformations",
+            "styleUrls": [
+                "./add-transformations.component.css"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./add-transformations.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [],
+            "outputsClass": [
+                {
+                    "name": "addTransformation",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 22,
+                    "modifierKind": [
+                        125
+                    ],
+                    "required": false
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "addTransformation",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 22,
+                    "modifierKind": [
+                        125
+                    ],
+                    "required": false
+                },
+                {
+                    "name": "TransformationType",
+                    "defaultValue": "TransformationType",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 21,
+                    "modifierKind": [
+                        125
+                    ]
+                }
+            ],
+            "methodsClass": [],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "CommonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatButtonModule",
+                    "type": "module"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, output } from '@angular/core';\nimport { CommonModule } from '@angular/common';\nimport { MatButtonModule } from '@angular/material/button';\n\nexport enum TransformationType {\n  Rotation = 'Rotation',\n  Scaling = 'Scaling',\n  Shearing = 'Shearing',\n  Translation = 'Translation'\n}\n\n@Component({\n  selector: 'app-add-transformations',\n  standalone: true,\n  imports: [CommonModule, MatButtonModule],\n  templateUrl: './add-transformations.component.html',\n  styleUrls: ['./add-transformations.component.css'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class AddTransformationsComponent {\n  public TransformationType = TransformationType;\n  public addTransformation = output<TransformationType>();\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n  display: flex;\n  flex-direction: row;\n  border-radius: 15px;\n  justify-content: center;\n  background-color: aliceblue;\n  opacity: 0.33;\n\n  transition:\n    opacity 0.4s;\n}\n\nbutton {\n  border: none;\n  padding: 1em;\n  opacity: 0;\n  cursor: pointer;\n  transition: all 0.4s;\n}\n\ndiv.button-container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  margin: 0 -3ex;\n  z-index: 10;\n  gap: 1ex;\n}\n\n:host:hover {\n  opacity: 1;\n\n  button {\n    opacity: 1;\n  }\n\n  button:hover {\n    background-color: red;\n    visibility: visible;\n  }\n}\n\n",
+                    "styleUrl": "./add-transformations.component.css"
+                }
+            ],
+            "stylesData": "",
+            "extends": [],
+            "templateData": "<ng-content select=\"[before]\" />\n<div class=\"button-container\">\n  <button mat-mini-fab aria-label=\"Add rotation\" (click)=\"addTransformation.emit(TransformationType.Rotation); $event.stopPropagation()\">\n    RO\n  </button>\n  <button mat-mini-fab aria-label=\"Add translation\" (click)=\"addTransformation.emit(TransformationType.Translation); $event.stopPropagation()\">\n    TR\n  </button>\n  <button mat-mini-fab aria-label=\"Add scaling\" (click)=\"addTransformation.emit(TransformationType.Scaling); $event.stopPropagation()\">\n    SC\n  </button>\n  <button mat-mini-fab aria-label=\"Add shear\" (click)=\"addTransformation.emit(TransformationType.Shearing); $event.stopPropagation()\">\n    SH\n</button>\n</div>\n<ng-content select=\"[after]\"/>"
+        },
+        {
+            "name": "AppComponent",
+            "id": "component-AppComponent-f170bf10e074e94543c0ab04421560cdc612f1c5dd4ddacf689b71ae2e7dabd1baa5128823fe03312830c34aa1ac27bfe443cd5abbb85d6d69d71e37f8a2d2d5",
+            "file": "src/app/app.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-root",
+            "styleUrls": [
+                "./app.component.css"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./app.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "axesVisible",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 46
+                },
+                {
+                    "name": "fb",
+                    "defaultValue": "inject(FormBuilder)",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 51,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "hoveredTransformation",
+                    "defaultValue": "-1",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 55
+                },
+                {
+                    "name": "matrices$",
+                    "defaultValue": "this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)))",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 70
+                },
+                {
+                    "name": "matrixArray",
+                    "defaultValue": "this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 59
+                },
+                {
+                    "name": "matrixForm",
+                    "defaultValue": "this.fb.group({\n    matrixArray: this.matrixArray\n  })",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 66
+                },
+                {
+                    "name": "selectedIndex",
+                    "defaultValue": "0",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "number",
+                    "optional": false,
+                    "description": "",
+                    "line": 53
+                },
+                {
+                    "name": "title",
+                    "defaultValue": "'htt'",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 52
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "addTransformation",
+                    "args": [
+                        {
+                            "name": "transformationType",
+                            "type": "TransformationType",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 72,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "transformationType",
+                            "type": "TransformationType",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "deleteTransformation",
+                    "args": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 90,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "drop",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "CdkDragDrop<TransformationEntry[]>",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 77,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "event",
+                            "type": "CdkDragDrop<TransformationEntry[]>",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "hoverTransformation",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 118,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "event",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "initialValue",
+                    "args": [
+                        {
+                            "name": "transformationType",
+                            "type": "TransformationType",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "TransformationEntry",
+                    "typeParameters": [],
+                    "line": 94,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "transformationType",
+                            "type": "TransformationType",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "matricesForTransformations",
+                    "args": [
+                        {
+                            "name": "transformations",
+                            "type": "TransformationEntry[]",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "Matrix[]",
+                    "typeParameters": [],
+                    "line": 114,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "transformations",
+                            "type": "TransformationEntry[]",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "select",
+                    "args": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 86,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setAxesVisible",
+                    "args": [
+                        {
+                            "name": "$event",
+                            "type": "MatButtonToggleChange",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 48,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "$event",
+                            "type": "MatButtonToggleChange",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "DragDropModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatButtonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatButtonToggleModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatIconModule",
+                    "type": "module"
+                },
+                {
+                    "name": "AsyncPipe",
+                    "type": "pipe"
+                },
+                {
+                    "name": "AddTransformationsComponent",
+                    "type": "component"
+                },
+                {
+                    "name": "GraphicsViewComponent",
+                    "type": "component"
+                },
+                {
+                    "name": "MatrixComponent",
+                    "type": "component"
+                },
+                {
+                    "name": "ReactiveFormsModule",
+                    "type": "module"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  selectedIndex = 0;\n\n  hoveredTransformation = -1;\n\n\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.select(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.select(event.currentIndex);\n  }\n\n  select(index: number): void {\n    this.selectedIndex = index;\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverTransformation(event: number) {\n    this.hoveredTransformation = event;\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n    height: 100vh;\n    gap: 0px 0px;\n    display: flex;\n    flex-direction: column;\n}\n\n.canvas {\n    flex-grow: 1;\n}\n\n.equation-list {\n    overflow-x: scroll;\n    scrollbar-width: thin;\n    scrollbar-color: #4d4d4d transparent;\n    scrollbar-gutter: stable;\n    background-color: white;\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    padding: 30px;\n    gap: 10px;\n}\n\n.cdk-drag-preview {\n    cursor: move;\n}\n\n.cdk-drag-placeholder {\n    opacity: 0.5;\n}\n\n.cdk-drag-animating {\n    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);\n}\n\n.math {\n    align-self: center;\n    font-size: xxx-large;\n    font-family: math;\n    display: inline-block;\n    white-space: nowrap;\n    margin-left: 0.5ex;\n    margin-right: 0.5ex;\n    display:flex;\n    align-items: center;\n\n    mat-button-toggle-group {\n        visibility: hidden;\n    }\n}\n\n.math:hover {\n    mat-button-toggle-group {\n        visibility: visible;\n    }\n}\n\n.viewport-options {\n    position:absolute; \n    right: 2ex; \n    top: 2ex;\n}  \n",
+                    "styleUrl": "./app.component.css"
+                }
+            ],
+            "stylesData": "",
+            "extends": [],
+            "templateData": "<app-graphics-view \n  #graphicsView class=\"canvas\" \n  [matrices]=\"matrices$ | async\" \n  [selectedIndex]=\"selectedIndex\"\n  [hoveredTransformation]=\"hoveredTransformation\" \n  [axesVisible]=\"axesVisible\" />\n<mat-button-toggle-group class=\"viewport-options\" multiple vertical (change)=\"setAxesVisible($event)\">\n  <mat-button-toggle value=\"axes\">AX</mat-button-toggle>\n</mat-button-toggle-group>\n<div [formGroup]=\"matrixForm\">\n  <div formArrayName=\"matrixArray\" cdkDropList #doneList=\"cdkDropList\" class=\"equation-list\"\n    cdkDropListOrientation=\"horizontal\" cdkDropListLockAxis=\"x\" (cdkDropListDropped)=\"drop($event)\">\n    @for (alias of matrixArray.controls; track alias; let i = $index) {\n    @if ($first) {\n      <div class=\"math\" before>x' =</div>\n      <app-add-transformations (addTransformation)=\"addTransformation($event,i)\" (mouseover)=\"hoverTransformation(i)\"\n      (mouseout)=\"hoverTransformation(-1)\" />      \n    }\n      <app-matrix [formControlName]=\"i\"  [class.selected]=\"selectedIndex === i\" (mouseover)=\"select(i)\"\n      (mouseout)=\"select(-1)\">\n      </app-matrix>\n    <app-add-transformations (addTransformation)=\"addTransformation($event,i+1)\" (mouseover)=\"hoverTransformation(i+1)\"\n      (mouseout)=\"hoverTransformation(-1)\" />\n      @if ($last) {\n      <div class=\"math\" after style=\"display: flex; flex-direction: row;\">x\n        <mat-button-toggle-group vertical (change)=\"graphicsView.setModel($event.value)\">\n          <mat-button-toggle value=\"smiley\"><mat-icon>\n            sentiment_satisfied\n          </mat-icon></mat-button-toggle>\n          <mat-button-toggle value=\"home\"><mat-icon>\n            home\n          </mat-icon></mat-button-toggle>\n        </mat-button-toggle-group>\n      </div>\n\n      }\n    }\n  </div>\n</div>"
+        },
+        {
+            "name": "GraphicsViewComponent",
+            "id": "component-GraphicsViewComponent-a70630e833624020a1e1c01a3f801f6ec79883de8178dfe7ad627bc9ee91c6eff99c229c7c6b9c748bd2ad05937e478d6899972e4f1c1a7da80beac9db8acc7c",
+            "file": "src/app/graphics-view/graphics-view.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-graphics-view",
+            "styleUrls": [
+                "./graphics-view.component.css"
+            ],
+            "styles": [],
+            "template": "<canvas #canvasRef></canvas>",
+            "templateUrl": [],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [
+                {
+                    "name": "axesVisible",
+                    "defaultValue": "false",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 88,
+                    "type": "boolean",
+                    "decorators": []
+                },
+                {
+                    "name": "hoveredTransformation",
+                    "defaultValue": "-1",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 87,
+                    "type": "number",
+                    "decorators": []
+                },
+                {
+                    "name": "matrices",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 85,
+                    "type": "Array<Matrix>",
+                    "decorators": []
+                },
+                {
+                    "name": "selectedIndex",
+                    "defaultValue": "-1",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 86,
+                    "type": "number",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "camera",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "FreeCamera",
+                    "optional": false,
+                    "description": "",
+                    "line": 89
+                },
+                {
+                    "name": "canvasElement",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ElementRef",
+                    "optional": false,
+                    "description": "",
+                    "line": 83,
+                    "decorators": [
+                        {
+                            "name": "ViewChild",
+                            "stringifiedArguments": "'canvasRef', {static: true}"
+                        }
+                    ],
+                    "modifierKind": [
+                        170
+                    ]
+                },
+                {
+                    "name": "coordinateSystemInstances",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "AxesViewer[]",
+                    "optional": false,
+                    "description": "",
+                    "line": 98,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "coordinateSystemMesh",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "AxesViewer",
+                    "optional": false,
+                    "description": "",
+                    "line": 97,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "engine",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "WebGPUEngine",
+                    "optional": false,
+                    "description": "",
+                    "line": 91,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "lineMesh",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Mesh",
+                    "optional": false,
+                    "description": "",
+                    "line": 94,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "model",
+                    "defaultValue": "'smiley'",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Model",
+                    "optional": false,
+                    "description": "",
+                    "line": 118,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "scene",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Scene",
+                    "optional": false,
+                    "description": "",
+                    "line": 92,
+                    "modifierKind": [
+                        123
+                    ]
+                },
+                {
+                    "name": "transformationMesh",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Mesh",
+                    "optional": false,
+                    "description": "",
+                    "line": 95,
+                    "modifierKind": [
+                        123
+                    ]
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "createScene",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Scene",
+                    "typeParameters": [],
+                    "line": 225,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "ngOnChanges",
+                    "args": [
+                        {
+                            "name": "changes",
+                            "type": "SimpleChanges",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 120,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "changes",
+                            "type": "SimpleChanges",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 201,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "modifierKind": [
+                        134
+                    ]
+                },
+                {
+                    "name": "rebuildMatrixBuffer",
+                    "args": [
+                        {
+                            "name": "points",
+                            "type": "Vector3[][]",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 126,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "points",
+                            "type": "Vector3[][]",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "resize",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 103,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "decorators": [
+                        {
+                            "name": "HostListener",
+                            "stringifiedArguments": "'window:resize'"
+                        }
+                    ],
+                    "modifierKind": [
+                        170
+                    ]
+                },
+                {
+                    "name": "setModel",
+                    "args": [
+                        {
+                            "name": "model",
+                            "type": "Model",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 260,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "model",
+                            "type": "Model",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [
+                {
+                    "name": "window:resize",
+                    "args": [],
+                    "argsDecorator": [],
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 103
+                }
+            ],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "CommonModule",
+                    "type": "module"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';\nimport { CommonModule } from '@angular/common';\n\nimport { Scene } from '@babylonjs/core/scene';\n\nimport { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';\nimport { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';\nimport { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';\nimport { Mesh } from '@babylonjs/core/Meshes/mesh';\nimport { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';\n\nimport '@babylonjs/core/Meshes/thinInstanceMesh';\nimport '@babylonjs/core/Materials/standardMaterial';\nimport { Camera } from '@babylonjs/core/Cameras/camera';\nimport { Color3, Color4 } from '@babylonjs/core/Maths/math.color';\nimport { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';\nimport { AxesViewer } from '@babylonjs/core/Debug/axesViewer';\n\nimport \"@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha\"\nimport { Engine } from '@babylonjs/core/Engines/engine';\n\nconst MAT4_ELEMENT_COUNT = 16;\n\nexport type Model = 'home' | 'smiley';\n\n// const points = [\n//   new Vector3(0, 0, 0),\n//   new Vector3(1, 0, 0),\n//   new Vector3(1, 1, 0),\n//   new Vector3(0, 0, 0),\n// ];\n\nconst circleRes = 20;\n\nconst circle = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const phi = index * 2 * Math.PI / circleRes;\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)\n});\n\nconst mouth = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const minPhi = -Math.PI / 4;\n  const maxPhi = -3 * Math.PI / 4;\n  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)\n});\n\nconst smiley = [\n  circle,\n  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),\n  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),\n  mouth\n];\n\nconst home = [\n  [\n    new Vector3(0,0,0),\n    new Vector3(1,0,0),\n    new Vector3(0,1,0),\n    new Vector3(1,1,0),\n\n    new Vector3(.5,1.5,0),\n    new Vector3(0,1,0),\n    new Vector3(0,0,0),\n\n    new Vector3(1,1,0),\n    new Vector3(1,0,0),\n  ]\n]\n\nconst models : Record<Model, Vector3[][]> = {\n  smiley,\n  home\n};\n\n@Component({\n  selector: 'app-graphics-view',\n  standalone: true,\n  imports: [CommonModule],\n  template: `<canvas #canvasRef></canvas>`,\n  styleUrls: ['./graphics-view.component.css']\n})\nexport class GraphicsViewComponent implements OnInit, OnChanges {\n  @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;\n\n  @Input() matrices: Array<Matrix> = [];\n  @Input() selectedIndex = -1;\n  @Input() hoveredTransformation = -1;\n  @Input() axesVisible = false;\n  camera: FreeCamera;\n\n  private engine: WebGPUEngine;\n  private scene: Scene;\n\n  private lineMesh: Mesh;\n  private transformationMesh: Mesh;\n\n  private coordinateSystemMesh: AxesViewer;\n  private coordinateSystemInstances: AxesViewer[] = [];\n\n  constructor(private elRef: ElementRef) { }\n\n  @HostListener('window:resize')\n  resize(): void {\n    const rect = this.elRef.nativeElement.getBoundingClientRect();\n    this.canvasElement.nativeElement.width = rect.width;\n    this.canvasElement.nativeElement.height = rect.height;\n\n    const aspectRatio = rect.width / rect.height;\n\n    this.engine.resize(true);\n\n    this.camera.orthoTop = 5;\n    this.camera.orthoBottom = -5;\n    this.camera.orthoLeft = -5 * aspectRatio;\n    this.camera.orthoRight = 5 * aspectRatio;\n  }\n\n  private model : Model = 'smiley';\n\n  ngOnChanges(changes: SimpleChanges): void {\n    if (this.lineMesh) {\n      this.rebuildMatrixBuffer(models[this.model]);\n    }\n  }\n\n  rebuildMatrixBuffer(points: Vector3[][]) {\n    if (!this.lineMesh) {\n      return;\n    }\n\n    this.transformationMesh?.dispose();\n    this.coordinateSystemInstances.forEach(axis => axis.dispose());\n    this.coordinateSystemInstances = [];\n\n    const startStopColor = Color4.FromColor3(Color3.White());\n    const intermediateColor = Color4.FromColor3(Color3.Gray());\n\n    const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];\n\n    const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);\n    const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);\n\n    let previousMatrix = Matrix.Identity();\n    const lastIndex = matricesIncludingStart.length - 1;\n\n    const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {\n      previousMatrix = acc.matrixAcc;\n      acc.matrixAcc = acc.matrixAcc.multiply(matrix);\n      acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);\n\n      const rotationMatrix = acc.matrixAcc.getRotationMatrix();\n\n      if (this.axesVisible) {\n        const axes = this.coordinateSystemMesh.createInstance();\n        const pos = Vector3.TransformCoordinates(new Vector3(0, 0, 0), acc.matrixAcc)\n        const xAxis = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);\n        const yAxis = Vector3.TransformCoordinates(new Vector3(0, 1, 0), rotationMatrix);\n        axes.update(pos, xAxis, yAxis, new Vector3(1, 1, 1));\n        this.coordinateSystemInstances.push(axes);\n      }\n\n      ((matrixIndex === 0 || matrixIndex === lastIndex || this.hoveredTransformation === matrixIndex) ?\n        startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);\n\n      if (matrixIndex !== lastIndex) {\n        acc.lines.push(...points.flat().map(point => [\n          Vector3.TransformCoordinates(point, previousMatrix),\n          Vector3.TransformCoordinates(point, acc.matrixAcc),\n        ]))\n      \n        const selected = this.selectedIndex === matrixIndex -1;\n        const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());\n        const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());\n        \n        acc.lineColors.push(...points.flat().map(point => [startColor, endColor]));\n      }\n      return acc\n    }, {\n      matrixAcc: Matrix.Identity(),\n      matrixBuffer,\n      colorBuffer,\n      lines: [new Array<Vector3>()],\n      lineColors: [new Array<Color4>()]\n    });\n\n    if (matricesIncludingStart.length > 0) {\n      this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);\n      this.lineMesh.thinInstanceSetBuffer('color', colorBuffer, 4);\n    }\n\n    this.transformationMesh?.dispose();\n    this.transformationMesh = CreateLineSystem(\"transformation-lines\", {\n      lines: visualData.lines,\n      colors: visualData.lineColors\n    }, this.scene);\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  async ngOnInit() {\n    const canvas = this.canvasElement.nativeElement;\n    this.engine = new WebGPUEngine(canvas);\n    await this.engine.initAsync();\n\n    this.createScene();\n\n    this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);\n\n    this.coordinateSystemMesh = new AxesViewer(this.scene);\n    this.coordinateSystemMesh.zAxis.dispose();\n    [\n      this.coordinateSystemMesh.xAxis,\n      this.coordinateSystemMesh.yAxis\n    ].forEach(mesh => mesh.setEnabled(false));\n\n    this.rebuildMatrixBuffer(smiley);\n\n    this.resize();\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  createScene() {\n    this.scene = new Scene(this.engine);\n    this.camera = new FreeCamera(\"camera1\",\n      new Vector3(0, 0, -10),\n      this.scene);\n    this.camera.setTarget(Vector3.Zero());\n\n    this.camera.mode = Camera.ORTHOGRAPHIC_CAMERA;\n\n    this.engine.setDepthFunction(Engine.ALWAYS);\n\n    const renderingOrder = [\n      'transformation-lines',\n      'picture',\n    ];\n\n    this.scene.setRenderingOrder(0, undefined,\n      undefined,\n      (meshA, meshB) => {\n        const indexA = renderingOrder.indexOf(meshA.getMesh().name);\n        const indexB = renderingOrder.indexOf(meshB.getMesh().name);\n        if (indexA === indexB) return 0\n        else if (indexA > indexB) return 1\n        else return -1\n      }\n    );\n\n    //this.camera.attachControl(this.canvasElement.nativeElement, true);\n    const light = new HemisphericLight(\"light\",\n      new Vector3(0, 1, 0),\n      this.scene);\n    light.intensity = 0.7;\n    return this.scene;\n  }\n\n  setModel(model: Model) {\n    \n    this.model = model;\n    this.lineMesh?.dispose();\n    this.lineMesh = CreateLineSystem('picture', { lines: models[model] }, this.scene);\n\n    this.rebuildMatrixBuffer(models[model]);\n  }\n}",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n    overflow: hidden;\n}\n\ncanvas {\n    position: absolute;\n    outline:none;\n}",
+                    "styleUrl": "./graphics-view.component.css"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "elRef",
+                        "type": "ElementRef",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 98,
+                "jsdoctags": [
+                    {
+                        "name": "elRef",
+                        "type": "ElementRef",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "extends": [],
+            "implements": [
+                "OnInit",
+                "OnChanges"
+            ]
+        },
+        {
+            "name": "MatrixComponent",
+            "id": "component-MatrixComponent-5a593807b9f3dc36e8926f454a4f26a524ad3921ad2794217dbcb6d47a6451351226e7c8cc140beeeb8b6220778f85401e28aa781608841624637a7ff365c9ed",
+            "file": "src/app/matrix/matrix.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [
+                {
+                    "name": "{\n    provide: NG_VALUE_ACCESSOR, multi: true, useExisting: MatrixComponent\n}",
+                    "type": "component"
+                }
+            ],
+            "selector": "app-matrix",
+            "styleUrls": [
+                "./matrix.component.css"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./matrix.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [
+                {
+                    "name": "CdkDrag"
+                }
+            ],
+            "inputsClass": [
+                {
+                    "name": "matrixItem",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 45,
+                    "type": "TransformationEntry",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "matrix",
+                    "defaultValue": "combineLatest(\n    [ this.slider.valueChanges, \n      this.affectedDimensions$\n    ]\n  ).pipe(\n    map(([slider, dimensions]) => {\n      switch (this.matrixItem.transformationType) {\n        case 'Translation': {\n          const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;\n          const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;\n          const newMatrix = Matrix.Translation(tx,ty,0);\n          this.prevMatrix = newMatrix\n          return newMatrix;\n        };\n\n        case 'Rotation': {\n          return Matrix.RotationZ(Angle.FromDegrees(slider).radians())\n        };\n\n        case 'Scaling': {\n          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).x;\n          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).y;\n\n          const newMatrix = Matrix.Scaling(sx,sy,0);\n          this.prevMatrix = newMatrix\n\n          return newMatrix;\n        };\n\n        case 'Shearing': {\n          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).y;\n          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).x;\n\n          const newMatrix = Matrix.Identity();\n          newMatrix.setRowFromFloats(0, 1, sx, 0, 0);\n          newMatrix.setRowFromFloats(1, sy, 1, 0, 0);\n          this.prevMatrix = newMatrix\n          return newMatrix;\n        };\n\n        default:\n          return Matrix.Identity();\n      }\n    })).pipe(startWith(Matrix.Identity()))",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 58
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "affectedDimensions$",
+                    "defaultValue": "new BehaviorSubject<Dimension[]>([Dimension.x])",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 50
+                },
+                {
+                    "name": "Dimension",
+                    "defaultValue": "Dimension",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 48,
+                    "modifierKind": [
+                        125
+                    ]
+                },
+                {
+                    "name": "MatrixElement",
+                    "defaultValue": "MatrixElement",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 47,
+                    "modifierKind": [
+                        125
+                    ]
+                },
+                {
+                    "name": "onChange",
+                    "defaultValue": "() => {...}",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 113
+                },
+                {
+                    "name": "prevMatrix",
+                    "defaultValue": "Matrix.Identity()",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 56
+                },
+                {
+                    "name": "slider",
+                    "defaultValue": "new FormControl(0)",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 52
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "clickAffectedDimension",
+                    "args": [
+                        {
+                            "name": "dimension",
+                            "type": "Dimension",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "event",
+                            "type": "MouseEvent",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 104,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "dimension",
+                            "type": "Dimension",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "event",
+                            "type": "MouseEvent",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "formatRotationLabel",
+                    "args": [
+                        {
+                            "name": "value",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "string",
+                    "typeParameters": [],
+                    "line": 114,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "value",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 154,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "registerOnChange",
+                    "args": [
+                        {
+                            "name": "fn",
+                            "type": "any",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 144,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "fn",
+                            "type": "any",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "registerOnTouched",
+                    "args": [
+                        {
+                            "name": "fn",
+                            "type": "any",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 147,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "fn",
+                            "type": "any",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setDisabledState",
+                    "args": [
+                        {
+                            "name": "isDisabled",
+                            "type": "boolean",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": true,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 150,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "isDisabled",
+                            "type": "boolean",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "writeValue",
+                    "args": [
+                        {
+                            "name": "obj",
+                            "type": "TransformationEntry",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 118,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "obj",
+                            "type": "TransformationEntry",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "CommonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatSliderModule",
+                    "type": "module"
+                },
+                {
+                    "name": "ReactiveFormsModule",
+                    "type": "module"
+                },
+                {
+                    "name": "LetDirective",
+                    "type": "directive"
+                },
+                {
+                    "name": "MatIconModule",
+                    "type": "module"
+                },
+                {
+                    "name": "CdkDragHandle"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, Input, OnInit, Output, Pipe, PipeTransform } from '@angular/core';\nimport { CommonModule } from '@angular/common';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\n\nimport { MatSliderModule } from '@angular/material/slider';\nimport { TransformationEntry } from '../app.component';\nimport { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith, withLatestFrom } from 'rxjs/operators';\nimport { BehaviorSubject, combineLatest, merge } from 'rxjs';\nimport { Angle } from '@babylonjs/core/Maths/math.path';\nimport { LetDirective } from '@ngrx/component';\nimport { MatIconModule } from '@angular/material/icon';\nimport { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';\n\n\nenum MatrixElement {\n  a11 = 'a11',\n  a21 = 'a21',\n  a12 = 'a12',\n  a22 = 'a22'\n}\n\nenum Dimension {\n  x,\n  y\n}\n\n@Component({\n  selector: 'app-matrix',\n  standalone: true,\n  hostDirectives: [CdkDrag],\n  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],\n  templateUrl: './matrix.component.html',\n  styleUrls: ['./matrix.component.css'],\n  providers: [\n    {\n      provide: NG_VALUE_ACCESSOR,\n      multi:true,\n      useExisting: MatrixComponent\n    }\n  ],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class MatrixComponent implements OnInit, ControlValueAccessor {\n  @Input() matrixItem: TransformationEntry;\n\n  public MatrixElement = MatrixElement;\n  public Dimension = Dimension;\n\n  affectedDimensions$ = new BehaviorSubject<Dimension[]>([Dimension.x]);\n\n  slider = new FormControl(0);\n\n  // combineLatest with affectedDimensions\n\n  prevMatrix = Matrix.Identity();\n\n  @Output() matrix = combineLatest(\n    [ this.slider.valueChanges, \n      this.affectedDimensions$\n    ]\n  ).pipe(\n    map(([slider, dimensions]) => {\n      switch (this.matrixItem.transformationType) {\n        case 'Translation': {\n          const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;\n          const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;\n          const newMatrix = Matrix.Translation(tx,ty,0);\n          this.prevMatrix = newMatrix\n          return newMatrix;\n        };\n\n        case 'Rotation': {\n          return Matrix.RotationZ(Angle.FromDegrees(slider).radians())\n        };\n\n        case 'Scaling': {\n          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).x;\n          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).y;\n\n          const newMatrix = Matrix.Scaling(sx,sy,0);\n          this.prevMatrix = newMatrix\n\n          return newMatrix;\n        };\n\n        case 'Shearing': {\n          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).y;\n          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).x;\n\n          const newMatrix = Matrix.Identity();\n          newMatrix.setRowFromFloats(0, 1, sx, 0, 0);\n          newMatrix.setRowFromFloats(1, sy, 1, 0, 0);\n          this.prevMatrix = newMatrix\n          return newMatrix;\n        };\n\n        default:\n          return Matrix.Identity();\n      }\n    })).pipe(startWith(Matrix.Identity()));\n  \n  \n  clickAffectedDimension(dimension: Dimension, event: MouseEvent) {\n    const affectedDimensions = this.affectedDimensions$.value;\n    if (affectedDimensions.includes(dimension)) {\n      this.affectedDimensions$.next(affectedDimensions.filter(d => d !== dimension));\n    } else {\n      this.affectedDimensions$.next([...affectedDimensions, dimension]);\n    }\n  }\n\n  onChange = (quantity : TransformationEntry) => { };\n  formatRotationLabel(value: number): string {\n      return `${value}°`;\n  }\n\n  writeValue(obj: TransformationEntry): void {\n    this.matrixItem = obj;\n    switch (obj.transformationType) {\n      case 'Rotation': {\n        const rotationMatrix = obj.matrix.getRotationMatrix();\n        const r11 = rotationMatrix.getRow(0).x;\n        const r21 = rotationMatrix.getRow(1).x\n        this.slider.setValue(Angle.FromRadians( Math.atan2(r21, r11)).degrees(), { emitEvent: false });\n      } break;\n      case 'Scaling': {\n        const x = obj.matrix.getRow(0).x;\n        const y = obj.matrix.getRow(1).y;\n        this.slider.patchValue(x, { emitEvent: false });\n      } break;\n      case 'Translation': {\n        const x = obj.matrix.getRow(3).x;\n        const y = obj.matrix.getRow(3).y;\n        this.slider.patchValue(x , { emitEvent: false });\n      } break;\n      case 'Shearing': {\n        const x = obj.matrix.getRow(0).y;\n        const y = obj.matrix.getRow(1).x;\n        this.slider.patchValue(x, { emitEvent: false });\n      } break;\n    }\n  }\n  registerOnChange(fn: any): void {\n    this.onChange = fn;\n  }\n  registerOnTouched(fn: any): void {\n    // throw new Error('Method not implemented.');\n  }\n  setDisabledState?(isDisabled: boolean): void {\n    // throw new Error('Method not implemented.');\n  }\n\n  ngOnInit(): void {    \n    this.matrix.subscribe(matrix => {\n      const val = {transformationType: this.matrixItem.transformationType, matrix}\n      this.onChange(val);\n    });\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.outer {\n    border-radius: 5% / 50%;\n    background-color: black\n}\n\n.outer:hover {\n  mat-slider { \n    visibility: visible; \n  }\n}\n\n.inner {\n  content: '';\n  background: inherit;\n  border-radius: 3% / 50%;\n  background-color: white;\n  margin-left: 0.5ex;\n  margin-right: 0.5ex;\n  padding: 1.5ex 1ex;\n\n  font-size: 1.3em;\n  font-family: \"Times New Roman\";\n\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  grid-template-rows: repeat(3, 1fr);\n  grid-column-gap: 0px;\n  grid-row-gap: 0px;\n  grid-auto-flow: column;\n  align-items: center;\n  justify-items: center;\n}\n\n.content {\n  visibility: hidden;\n  background-color: h;\n}\n\n.header {\n  display: flex; \n  flex-direction: row; \n  align-items: stretch;\n  position: relative; \n  margin-bottom: -1.2ex; \n  background-color: rgb(240, 240, 240);\n  border-radius: 15px;\n  opacity: 0;\n}\n\n.dragHandle {\n  cursor: grab;\n  height: 20px;\n  padding: 0ex 1ex;\n}\n\n.deleteArea {\n  display:flex;\n  border-radius: 0px 15px 15px 0px;\n  cursor: pointer;\n  transition: all 0.4s;\n  padding: 0 0.75ex 0 0.5ex;\n  align-items: center;\n}\n.deleteArea:hover {\n  background-color: red;\n  .deleteIcon {\n      color: white;\n  }\n}\n\n.deleteIcon {\n  font-size: 1.0em;\n  height: 1.0em;\n  width: 1.0em;\n}\n\n:host:hover {\n  mat-slider { \n    opacity: 1;\n  }\n\n  .header {\n    opacity: 1;\n  }\n}\n\nmat-slider { \n  width: 80%; \n  margin-top: -2.75ex;\n  opacity: 0;\n}\n\nspan.highlight {\n  border-radius: 1ex;\n  font-weight: bold;\n  padding: .25ex 1ex;\n}\n\nspan.selected {\n  background-color: rgb(216, 132, 209);\n  border-radius: 1ex;\n  font-weight: bold;\n  padding: .25ex 1ex;\n}",
+                    "styleUrl": "./matrix.component.css"
+                }
+            ],
+            "stylesData": "",
+            "extends": [],
+            "implements": [
+                "OnInit",
+                "ControlValueAccessor"
+            ],
+            "templateData": "<div class=\"header\">\n    <div class=\"dragHandle\" cdkDragHandle>{{matrixItem.transformationType}}</div>\n    <div class=\"deleteArea\" >\n      <mat-icon class=\"deleteIcon\">delete</mat-icon>\n    </div>\n  </div>\n\n<div class=\"outer\">\n    <div class=\"inner\" *ngrxLet=\"{\n        dimensions: affectedDimensions$,\n        m: matrix,\n        } as shared\">\n        @switch (matrixItem?.transformationType) {\n            @case ('Translation') {\n                <span>1</span>\n                <span>0</span>\n                <span>0</span>\n                <span>0</span>\n                <span>1</span>\n                <span>0</span>\n                <span class=\"highlight\" [class.selected]=\"shared.dimensions.includes(Dimension.x)\" (click)=\"clickAffectedDimension(Dimension.x, $event)\">{{ shared.m.getTranslation().x | number: '1.2-2' }}</span>\n                <span class=\"highlight\" [class.selected]=\"shared.dimensions.includes(Dimension.y)\" (click)=\"clickAffectedDimension(Dimension.y, $event)\">{{ shared.m.getTranslation().y | number: '1.2-2' }}</span>\n                <span>1</span>\n            }\n            @case ('Scaling') {\n                <span class=\"highlight\" [class.selected]=\"shared.dimensions.includes(Dimension.x)\" (click)=\"clickAffectedDimension(Dimension.x, $event)\">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>\n                <span>0</span>\n                <span>0</span>\n\n                <span>0</span>\n                <span class=\"highlight\"[class.selected]=\"shared.dimensions.includes(Dimension.y)\" (click)=\"clickAffectedDimension(Dimension.y, $event)\">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>\n                <span>0</span>\n                \n                <span>0</span>\n                <span>0</span>\n                <span>1</span>\n            }\n            @case ('Rotation') {\n                <span class=\"highlight\">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>\n                <span class=\"highlight\">{{ shared.m.getRow(0).y | number: '1.2-2' }}</span>\n                <span>0</span> \n                \n                <span class=\"highlight\">{{ shared.m.getRow(1).x | number: '1.2-2' }}</span>\n                <span class=\"highlight\">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>\n                <span>0</span>\n                \n                <span>0</span>\n                <span>0</span>\n                <span>1</span>\n            }\n            @case ('Shearing') {\n                <span>1</span>\n                <span class=\"highlight\" [class.selected]=\"shared.dimensions.includes(Dimension.x)\" (click)=\"clickAffectedDimension(Dimension.x, $event)\">{{ shared.m.getRow(0).y | number: '1.2-2'}}</span>\n                <span>0</span>\n                \n                <span class=\"highlight\" [class.selected]=\"shared.dimensions.includes(Dimension.y)\" (click)=\"clickAffectedDimension(Dimension.y, $event)\">{{ shared.m.getRow(1).x | number: '1.2-2'}}</span>\n                <span>1</span>\n                <span>0</span>\n                \n                <span>0</span>\n                <span>1</span>\n                <span>0</span>\n            }\n        }\n        </div>    \n\n</div>\n\n@if (matrixItem?.transformationType === 'Rotation') {\n    <mat-slider discrete [displayWith]=\"formatRotationLabel\" class=\"sliders\" min=\"-360.0\" max=\"360.0\" step=\"1\" value=\"0\" style=\"width: 100%\">\n        <input matSliderThumb [formControl]=\"slider\">\n    </mat-slider>\n} @else {\n    <mat-slider min=\"-10.0\" max=\"10.0\" step=\"0.1\" value=\"10\">\n        <input matSliderThumb [formControl]=\"slider\">\n    </mat-slider>\n}"
+        }
+    ],
+    "modules": [],
+    "miscellaneous": {
+        "variables": [
+            {
+                "name": "circle",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "",
+                "defaultValue": "new Array(circleRes + 1).fill(0).map((val, index) => {\n  const phi = index * 2 * Math.PI / circleRes;\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)\n})"
+            },
+            {
+                "name": "circleRes",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "number",
+                "defaultValue": "20"
+            },
+            {
+                "name": "home",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "[]",
+                "defaultValue": "[\n  [\n    new Vector3(0,0,0),\n    new Vector3(1,0,0),\n    new Vector3(0,1,0),\n    new Vector3(1,1,0),\n\n    new Vector3(.5,1.5,0),\n    new Vector3(0,1,0),\n    new Vector3(0,0,0),\n\n    new Vector3(1,1,0),\n    new Vector3(1,0,0),\n  ]\n]"
+            },
+            {
+                "name": "MAT4_ELEMENT_COUNT",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "number",
+                "defaultValue": "16"
+            },
+            {
+                "name": "models",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Record<Model, [][]>",
+                "defaultValue": "{\n  smiley,\n  home\n}"
+            },
+            {
+                "name": "mouth",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "",
+                "defaultValue": "new Array(circleRes + 1).fill(0).map((val, index) => {\n  const minPhi = -Math.PI / 4;\n  const maxPhi = -3 * Math.PI / 4;\n  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)\n})"
+            },
+            {
+                "name": "smiley",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "[]",
+                "defaultValue": "[\n  circle,\n  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),\n  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),\n  mouth\n]"
+            }
+        ],
+        "functions": [],
+        "typealiases": [
+            {
+                "name": "Model",
+                "ctype": "miscellaneous",
+                "subtype": "typealias",
+                "rawtype": "\"home\" | \"smiley\"",
+                "file": "src/app/graphics-view/graphics-view.component.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "kind": 192
+            }
+        ],
+        "enumerations": [
+            {
+                "name": "Dimension",
+                "childs": [
+                    {
+                        "name": "x",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "y",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "ctype": "miscellaneous",
+                "subtype": "enum",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "file": "src/app/matrix/matrix.component.ts"
+            },
+            {
+                "name": "MatrixElement",
+                "childs": [
+                    {
+                        "name": "a11",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "a11"
+                    },
+                    {
+                        "name": "a21",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "a21"
+                    },
+                    {
+                        "name": "a12",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "a12"
+                    },
+                    {
+                        "name": "a22",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "a22"
+                    }
+                ],
+                "ctype": "miscellaneous",
+                "subtype": "enum",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "file": "src/app/matrix/matrix.component.ts"
+            },
+            {
+                "name": "TransformationType",
+                "childs": [
+                    {
+                        "name": "Rotation",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "Rotation"
+                    },
+                    {
+                        "name": "Scaling",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "Scaling"
+                    },
+                    {
+                        "name": "Shearing",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "Shearing"
+                    },
+                    {
+                        "name": "Translation",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "value": "Translation"
+                    }
+                ],
+                "ctype": "miscellaneous",
+                "subtype": "enum",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "file": "src/app/add-transformations/add-transformations.component.ts"
+            }
+        ],
+        "groupedVariables": {
+            "src/app/graphics-view/graphics-view.component.ts": [
+                {
+                    "name": "circle",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "defaultValue": "new Array(circleRes + 1).fill(0).map((val, index) => {\n  const phi = index * 2 * Math.PI / circleRes;\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)\n})"
+                },
+                {
+                    "name": "circleRes",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "number",
+                    "defaultValue": "20"
+                },
+                {
+                    "name": "home",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "[]",
+                    "defaultValue": "[\n  [\n    new Vector3(0,0,0),\n    new Vector3(1,0,0),\n    new Vector3(0,1,0),\n    new Vector3(1,1,0),\n\n    new Vector3(.5,1.5,0),\n    new Vector3(0,1,0),\n    new Vector3(0,0,0),\n\n    new Vector3(1,1,0),\n    new Vector3(1,0,0),\n  ]\n]"
+                },
+                {
+                    "name": "MAT4_ELEMENT_COUNT",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "number",
+                    "defaultValue": "16"
+                },
+                {
+                    "name": "models",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Record<Model, [][]>",
+                    "defaultValue": "{\n  smiley,\n  home\n}"
+                },
+                {
+                    "name": "mouth",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "defaultValue": "new Array(circleRes + 1).fill(0).map((val, index) => {\n  const minPhi = -Math.PI / 4;\n  const maxPhi = -3 * Math.PI / 4;\n  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)\n})"
+                },
+                {
+                    "name": "smiley",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "[]",
+                    "defaultValue": "[\n  circle,\n  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),\n  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),\n  mouth\n]"
+                }
+            ]
+        },
+        "groupedFunctions": {},
+        "groupedEnumerations": {
+            "src/app/matrix/matrix.component.ts": [
+                {
+                    "name": "Dimension",
+                    "childs": [
+                        {
+                            "name": "x",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "y",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "ctype": "miscellaneous",
+                    "subtype": "enum",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "file": "src/app/matrix/matrix.component.ts"
+                },
+                {
+                    "name": "MatrixElement",
+                    "childs": [
+                        {
+                            "name": "a11",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "a11"
+                        },
+                        {
+                            "name": "a21",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "a21"
+                        },
+                        {
+                            "name": "a12",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "a12"
+                        },
+                        {
+                            "name": "a22",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "a22"
+                        }
+                    ],
+                    "ctype": "miscellaneous",
+                    "subtype": "enum",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "file": "src/app/matrix/matrix.component.ts"
+                }
+            ],
+            "src/app/add-transformations/add-transformations.component.ts": [
+                {
+                    "name": "TransformationType",
+                    "childs": [
+                        {
+                            "name": "Rotation",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "Rotation"
+                        },
+                        {
+                            "name": "Scaling",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "Scaling"
+                        },
+                        {
+                            "name": "Shearing",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "Shearing"
+                        },
+                        {
+                            "name": "Translation",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "value": "Translation"
+                        }
+                    ],
+                    "ctype": "miscellaneous",
+                    "subtype": "enum",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "file": "src/app/add-transformations/add-transformations.component.ts"
+                }
+            ]
+        },
+        "groupedTypeAliases": {
+            "src/app/graphics-view/graphics-view.component.ts": [
+                {
+                    "name": "Model",
+                    "ctype": "miscellaneous",
+                    "subtype": "typealias",
+                    "rawtype": "\"home\" | \"smiley\"",
+                    "file": "src/app/graphics-view/graphics-view.component.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "kind": 192
+                }
+            ]
+        }
+    },
+    "routes": [],
+    "coverage": {
+        "count": 0,
+        "status": "low",
+        "files": [
+            {
+                "filePath": "src/app/add-transformations/add-transformations.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "AddTransformationsComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/4",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/app.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "AppComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/17",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/app.component.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "TransformationEntry",
+                "coveragePercent": 0,
+                "coverageCount": "0/3",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "GraphicsViewComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/22",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "circle",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "circleRes",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "home",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "MAT4_ELEMENT_COUNT",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "models",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "mouth",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/graphics-view/graphics-view.component.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "smiley",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/matrix/matrix.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "MatrixComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/16",
+                "status": "low"
+            }
+        ]
+    }
+}
