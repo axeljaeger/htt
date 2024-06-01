@@ -3,12 +3,12 @@
     "interfaces": [
         {
             "name": "TransformationEntry",
-            "id": "interface-TransformationEntry-f170bf10e074e94543c0ab04421560cdc612f1c5dd4ddacf689b71ae2e7dabd1baa5128823fe03312830c34aa1ac27bfe443cd5abbb85d6d69d71e37f8a2d2d5",
+            "id": "interface-TransformationEntry-427c9945594979fd970343fac545cc8b16f3d32c0a9fa34624f74f1edd414351a2574335a7a6f4757cae3984bc698b1249f912657a40efff8c23c5c67d44b205",
             "file": "src/app/app.component.ts",
             "deprecated": false,
             "deprecationMessage": "",
             "type": "interface",
-            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  selectedIndex = 0;\n\n  hoveredTransformation = -1;\n\n\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.select(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.select(event.currentIndex);\n  }\n\n  select(index: number): void {\n    this.selectedIndex = index;\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverTransformation(event: number) {\n    this.hoveredTransformation = event;\n  }\n}\n",
+            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  \n  hoveredPicture = -1;\n  hoveredTransformation = -1;\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.hoverTransformation(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.hoverTransformation(event.currentIndex);\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverPicture(index: number) {\n    this.hoveredTransformation = -1\n    this.hoveredPicture = index;\n  }\n\n  hoverTransformation(index: number): void {\n    this.hoveredPicture = -1;\n    this.hoveredTransformation = index;\n  }\n}\n",
             "properties": [
                 {
                     "name": "matrix",
@@ -128,7 +128,7 @@
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ":host {\n  display: flex;\n  flex-direction: row;\n  border-radius: 15px;\n  justify-content: center;\n  background-color: aliceblue;\n  opacity: 0.33;\n\n  transition:\n    opacity 0.4s;\n}\n\nbutton {\n  border: none;\n  padding: 1em;\n  opacity: 0;\n  cursor: pointer;\n  transition: all 0.4s;\n}\n\ndiv.button-container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  margin: 0 -3ex;\n  z-index: 10;\n  gap: 1ex;\n}\n\n:host:hover {\n  opacity: 1;\n\n  button {\n    opacity: 1;\n  }\n\n  button:hover {\n    background-color: red;\n    visibility: visible;\n  }\n}\n\n",
+                    "data": ":host {\n  display: flex;\n  flex-direction: row;\n  border-radius: 15px;\n  justify-content: center;\n  background-color: gray;\n  opacity: 0.33;\n  width: 1ex;\n  transition:\n    opacity 0.4s;\n}\n\nbutton {\n  border: none;\n  padding: 1em;\n  opacity: 0;\n  cursor: pointer;\n  transition: all 0.4s;\n}\n\ndiv.button-container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  margin: 0 -3ex;\n  z-index: 10;\n  gap: 1ex; \n}\n\n:host:hover {\n  opacity: 1;\n\n  button {\n    opacity: 1;\n  }\n\n  button:hover {\n    visibility: visible;\n  }\n}\n\n",
                     "styleUrl": "./add-transformations.component.css"
                 }
             ],
@@ -138,7 +138,7 @@
         },
         {
             "name": "AppComponent",
-            "id": "component-AppComponent-f170bf10e074e94543c0ab04421560cdc612f1c5dd4ddacf689b71ae2e7dabd1baa5128823fe03312830c34aa1ac27bfe443cd5abbb85d6d69d71e37f8a2d2d5",
+            "id": "component-AppComponent-427c9945594979fd970343fac545cc8b16f3d32c0a9fa34624f74f1edd414351a2574335a7a6f4757cae3984bc698b1249f912657a40efff8c23c5c67d44b205",
             "file": "src/app/app.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -181,6 +181,16 @@
                     ]
                 },
                 {
+                    "name": "hoveredPicture",
+                    "defaultValue": "-1",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 54
+                },
+                {
                     "name": "hoveredTransformation",
                     "defaultValue": "-1",
                     "deprecated": false,
@@ -198,7 +208,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 70
+                    "line": 68
                 },
                 {
                     "name": "matrixArray",
@@ -208,7 +218,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 59
+                    "line": 57
                 },
                 {
                     "name": "matrixForm",
@@ -218,17 +228,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 66
-                },
-                {
-                    "name": "selectedIndex",
-                    "defaultValue": "0",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "number",
-                    "optional": false,
-                    "description": "",
-                    "line": 53
+                    "line": 64
                 },
                 {
                     "name": "title",
@@ -261,7 +261,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 72,
+                    "line": 70,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -298,7 +298,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 90,
+                    "line": 84,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -326,7 +326,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 77,
+                    "line": 75,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -342,10 +342,10 @@
                     ]
                 },
                 {
-                    "name": "hoverTransformation",
+                    "name": "hoverPicture",
                     "args": [
                         {
-                            "name": "event",
+                            "name": "index",
                             "type": "number",
                             "deprecated": false,
                             "deprecationMessage": ""
@@ -354,12 +354,40 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 118,
+                    "line": 112,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
                         {
-                            "name": "event",
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "hoverTransformation",
+                    "args": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 117,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "index",
                             "type": "number",
                             "deprecated": false,
                             "deprecationMessage": "",
@@ -382,7 +410,7 @@
                     "optional": false,
                     "returnType": "TransformationEntry",
                     "typeParameters": [],
-                    "line": 94,
+                    "line": 88,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -410,41 +438,13 @@
                     "optional": false,
                     "returnType": "Matrix[]",
                     "typeParameters": [],
-                    "line": 114,
+                    "line": 108,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
                         {
                             "name": "transformations",
                             "type": "TransformationEntry[]",
-                            "deprecated": false,
-                            "deprecationMessage": "",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "select",
-                    "args": [
-                        {
-                            "name": "index",
-                            "type": "number",
-                            "deprecated": false,
-                            "deprecationMessage": ""
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 86,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "jsdoctags": [
-                        {
-                            "name": "index",
-                            "type": "number",
                             "deprecated": false,
                             "deprecationMessage": "",
                             "tagName": {
@@ -528,7 +528,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  selectedIndex = 0;\n\n  hoveredTransformation = -1;\n\n\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.select(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.select(event.currentIndex);\n  }\n\n  select(index: number): void {\n    this.selectedIndex = index;\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverTransformation(event: number) {\n    this.hoveredTransformation = event;\n  }\n}\n",
+            "sourceCode": "import { Component, inject } from '@angular/core';\n\nimport {\n  DragDropModule,\n  CdkDragDrop,\n} from '@angular/cdk/drag-drop';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatButtonModule } from '@angular/material/button';\nimport {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';\n\nimport { AsyncPipe } from '@angular/common';\nimport {\n  AddTransformationsComponent,\n  TransformationType,\n} from './add-transformations/add-transformations.component';\nimport { GraphicsViewComponent } from './graphics-view/graphics-view.component';\nimport { Matrix } from '@babylonjs/core/Maths/math.vector';\nimport { MatrixComponent } from './matrix/matrix.component';\nimport { FormBuilder, ReactiveFormsModule } from '@angular/forms';\nimport { map, startWith } from 'rxjs/operators';\n\nexport interface TransformationEntry {\n  transformationType: TransformationType;\n  matrix: Matrix;\n}\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.css'],\n  standalone: true,\n  imports: [\n    DragDropModule,\n    MatButtonModule,\n    MatButtonToggleModule,\n    MatIconModule,\n    AsyncPipe,\n    AddTransformationsComponent,\n    GraphicsViewComponent,\n    MatrixComponent,\n    ReactiveFormsModule,\n\n  ],\n})\nexport class AppComponent {\n  axesVisible : false;\n\n  setAxesVisible($event: MatButtonToggleChange) {\n  this.axesVisible = $event.value.includes('axes');\n}\n  private fb = inject(FormBuilder);\n  title = 'htt';\n  \n  hoveredPicture = -1;\n  hoveredTransformation = -1;\n\n  matrixArray = this.fb.array([\n    this.fb.control({\n      transformationType: TransformationType.Translation,\n      matrix: Matrix.Translation(5, 0, 0),\n    } as TransformationEntry)\n  ])\n\n  matrixForm = this.fb.group({\n    matrixArray: this.matrixArray\n  });\n\n  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));\n\n  addTransformation(transformationType: TransformationType, index: number) {\n    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));\n    this.hoverTransformation(index);\n  }\n\n  drop(event: CdkDragDrop<TransformationEntry[]>) {\n    const control = this.matrixArray.controls.at(event.previousIndex);\n\n    this.matrixArray.removeAt(event.previousIndex);\n    this.matrixArray.insert(event.currentIndex, control);\n\n    this.hoverTransformation(event.currentIndex);\n  }\n\n  deleteTransformation(index: number): void {\n    this.matrixArray.removeAt(index);\n  }\n\n  initialValue(transformationType: TransformationType): TransformationEntry {\n    const matrix = ((transformation) => {\n      switch (transformation) {\n        case TransformationType.Rotation:\n          return Matrix.RotationZ(Math.PI / 2.0);\n        case TransformationType.Translation:\n          return Matrix.Translation(1, 0, 0);\n        case TransformationType.Scaling:\n          return Matrix.Scaling(1, 1, 1);\n        case TransformationType.Shearing:\n          return Matrix.Scaling(2, 2, 2);\n      }\n    })(transformationType);\n\n    return {\n      transformationType,\n      matrix,\n    };\n  }\n\n  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {\n    return transformations.map((trans) => trans.matrix);\n  }\n\n  hoverPicture(index: number) {\n    this.hoveredTransformation = -1\n    this.hoveredPicture = index;\n  }\n\n  hoverTransformation(index: number): void {\n    this.hoveredPicture = -1;\n    this.hoveredTransformation = index;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -538,11 +538,11 @@
             ],
             "stylesData": "",
             "extends": [],
-            "templateData": "<app-graphics-view \n  #graphicsView class=\"canvas\" \n  [matrices]=\"matrices$ | async\" \n  [selectedIndex]=\"selectedIndex\"\n  [hoveredTransformation]=\"hoveredTransformation\" \n  [axesVisible]=\"axesVisible\" />\n<mat-button-toggle-group class=\"viewport-options\" multiple vertical (change)=\"setAxesVisible($event)\">\n  <mat-button-toggle value=\"axes\">AX</mat-button-toggle>\n</mat-button-toggle-group>\n<div [formGroup]=\"matrixForm\">\n  <div formArrayName=\"matrixArray\" cdkDropList #doneList=\"cdkDropList\" class=\"equation-list\"\n    cdkDropListOrientation=\"horizontal\" cdkDropListLockAxis=\"x\" (cdkDropListDropped)=\"drop($event)\">\n    @for (alias of matrixArray.controls; track alias; let i = $index) {\n    @if ($first) {\n      <div class=\"math\" before>x' =</div>\n      <app-add-transformations (addTransformation)=\"addTransformation($event,i)\" (mouseover)=\"hoverTransformation(i)\"\n      (mouseout)=\"hoverTransformation(-1)\" />      \n    }\n      <app-matrix [formControlName]=\"i\"  [class.selected]=\"selectedIndex === i\" (mouseover)=\"select(i)\"\n      (mouseout)=\"select(-1)\">\n      </app-matrix>\n    <app-add-transformations (addTransformation)=\"addTransformation($event,i+1)\" (mouseover)=\"hoverTransformation(i+1)\"\n      (mouseout)=\"hoverTransformation(-1)\" />\n      @if ($last) {\n      <div class=\"math\" after style=\"display: flex; flex-direction: row;\">x\n        <mat-button-toggle-group vertical (change)=\"graphicsView.setModel($event.value)\">\n          <mat-button-toggle value=\"smiley\"><mat-icon>\n            sentiment_satisfied\n          </mat-icon></mat-button-toggle>\n          <mat-button-toggle value=\"home\"><mat-icon>\n            home\n          </mat-icon></mat-button-toggle>\n        </mat-button-toggle-group>\n      </div>\n\n      }\n    }\n  </div>\n</div>"
+            "templateData": "<app-graphics-view \n  #graphicsView class=\"canvas\" \n  [matrices]=\"matrices$ | async\" \n  [hoveredPicture]=\"hoveredPicture\"\n  [hoveredTransformation]=\"hoveredTransformation\" \n  [axesVisible]=\"axesVisible\" />\n<mat-button-toggle-group class=\"viewport-options\" multiple vertical (change)=\"setAxesVisible($event)\">\n  <mat-button-toggle value=\"axes\">AX</mat-button-toggle>\n</mat-button-toggle-group>\n<div [formGroup]=\"matrixForm\">\n  <div formArrayName=\"matrixArray\" cdkDropList #doneList=\"cdkDropList\" class=\"equation-list\"\n    cdkDropListOrientation=\"horizontal\" cdkDropListLockAxis=\"x\" (cdkDropListDropped)=\"drop($event)\">\n    @for (alias of matrixArray.controls; track alias; let i = $index) {\n    @if ($first) {\n      <div class=\"math\" before>x' =</div>\n      <app-add-transformations (addTransformation)=\"addTransformation($event,i)\" (mouseover)=\"hoverPicture(i)\"\n      (mouseout)=\"hoverPicture(-1)\"></app-add-transformations>\n    }\n      <app-matrix [formControlName]=\"i\"  [class.selected]=\"hoveredTransformation === i\" (mouseover)=\"hoverTransformation(i)\"\n      (mouseout)=\"hoverTransformation(-1)\">\n      </app-matrix>\n    <app-add-transformations (addTransformation)=\"addTransformation($event,i+1)\" (mouseover)=\"hoverPicture(i+1)\"\n      (mouseout)=\"hoverPicture(-1)\" />\n      @if ($last) {\n      <div class=\"math\" after style=\"display: flex; flex-direction: row;\">x\n        <mat-button-toggle-group vertical (change)=\"graphicsView.setModel($event.value)\">\n          <mat-button-toggle value=\"smiley\"><mat-icon>\n            sentiment_satisfied\n          </mat-icon></mat-button-toggle>\n          <mat-button-toggle value=\"home\"><mat-icon>\n            home\n          </mat-icon></mat-button-toggle>\n        </mat-button-toggle-group>\n      </div>\n\n      }\n    }\n  </div>\n</div>"
         },
         {
             "name": "GraphicsViewComponent",
-            "id": "component-GraphicsViewComponent-a70630e833624020a1e1c01a3f801f6ec79883de8178dfe7ad627bc9ee91c6eff99c229c7c6b9c748bd2ad05937e478d6899972e4f1c1a7da80beac9db8acc7c",
+            "id": "component-GraphicsViewComponent-8fb8616359a939823d651c29ba8fd0671ec0a45d0ed5e737d1ad7ecf7172dd656ac318dcbe7ffc5f10952073441e6296124bbfa84649e8d0c611d601dd8fea5b",
             "file": "src/app/graphics-view/graphics-view.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -564,8 +564,17 @@
                     "defaultValue": "false",
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "line": 88,
+                    "line": 90,
                     "type": "boolean",
+                    "decorators": []
+                },
+                {
+                    "name": "hoveredPicture",
+                    "defaultValue": "-1",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 87,
+                    "type": "number",
                     "decorators": []
                 },
                 {
@@ -573,7 +582,7 @@
                     "defaultValue": "-1",
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "line": 87,
+                    "line": 88,
                     "type": "number",
                     "decorators": []
                 },
@@ -584,15 +593,6 @@
                     "deprecationMessage": "",
                     "line": 85,
                     "type": "Array<Matrix>",
-                    "decorators": []
-                },
-                {
-                    "name": "selectedIndex",
-                    "defaultValue": "-1",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "line": 86,
-                    "type": "number",
                     "decorators": []
                 }
             ],
@@ -605,7 +605,7 @@
                     "type": "FreeCamera",
                     "optional": false,
                     "description": "",
-                    "line": 89
+                    "line": 91
                 },
                 {
                     "name": "canvasElement",
@@ -633,7 +633,7 @@
                     "type": "AxesViewer[]",
                     "optional": false,
                     "description": "",
-                    "line": 98,
+                    "line": 100,
                     "modifierKind": [
                         123
                     ]
@@ -645,7 +645,7 @@
                     "type": "AxesViewer",
                     "optional": false,
                     "description": "",
-                    "line": 97,
+                    "line": 99,
                     "modifierKind": [
                         123
                     ]
@@ -657,7 +657,7 @@
                     "type": "WebGPUEngine",
                     "optional": false,
                     "description": "",
-                    "line": 91,
+                    "line": 93,
                     "modifierKind": [
                         123
                     ]
@@ -669,7 +669,7 @@
                     "type": "Mesh",
                     "optional": false,
                     "description": "",
-                    "line": 94,
+                    "line": 96,
                     "modifierKind": [
                         123
                     ]
@@ -682,7 +682,7 @@
                     "type": "Model",
                     "optional": false,
                     "description": "",
-                    "line": 118,
+                    "line": 120,
                     "modifierKind": [
                         123
                     ]
@@ -694,7 +694,7 @@
                     "type": "Scene",
                     "optional": false,
                     "description": "",
-                    "line": 92,
+                    "line": 94,
                     "modifierKind": [
                         123
                     ]
@@ -706,7 +706,7 @@
                     "type": "Mesh",
                     "optional": false,
                     "description": "",
-                    "line": 95,
+                    "line": 97,
                     "modifierKind": [
                         123
                     ]
@@ -719,7 +719,7 @@
                     "optional": false,
                     "returnType": "Scene",
                     "typeParameters": [],
-                    "line": 225,
+                    "line": 240,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -736,7 +736,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 120,
+                    "line": 122,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -757,7 +757,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 201,
+                    "line": 216,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "modifierKind": [
@@ -777,7 +777,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 126,
+                    "line": 128,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -798,7 +798,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 103,
+                    "line": 105,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "decorators": [
@@ -824,7 +824,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 260,
+                    "line": 275,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -850,7 +850,7 @@
                     "argsDecorator": [],
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "line": 103
+                    "line": 105
                 }
             ],
             "standalone": true,
@@ -863,7 +863,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';\nimport { CommonModule } from '@angular/common';\n\nimport { Scene } from '@babylonjs/core/scene';\n\nimport { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';\nimport { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';\nimport { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';\nimport { Mesh } from '@babylonjs/core/Meshes/mesh';\nimport { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';\n\nimport '@babylonjs/core/Meshes/thinInstanceMesh';\nimport '@babylonjs/core/Materials/standardMaterial';\nimport { Camera } from '@babylonjs/core/Cameras/camera';\nimport { Color3, Color4 } from '@babylonjs/core/Maths/math.color';\nimport { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';\nimport { AxesViewer } from '@babylonjs/core/Debug/axesViewer';\n\nimport \"@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha\"\nimport { Engine } from '@babylonjs/core/Engines/engine';\n\nconst MAT4_ELEMENT_COUNT = 16;\n\nexport type Model = 'home' | 'smiley';\n\n// const points = [\n//   new Vector3(0, 0, 0),\n//   new Vector3(1, 0, 0),\n//   new Vector3(1, 1, 0),\n//   new Vector3(0, 0, 0),\n// ];\n\nconst circleRes = 20;\n\nconst circle = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const phi = index * 2 * Math.PI / circleRes;\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)\n});\n\nconst mouth = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const minPhi = -Math.PI / 4;\n  const maxPhi = -3 * Math.PI / 4;\n  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)\n});\n\nconst smiley = [\n  circle,\n  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),\n  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),\n  mouth\n];\n\nconst home = [\n  [\n    new Vector3(0,0,0),\n    new Vector3(1,0,0),\n    new Vector3(0,1,0),\n    new Vector3(1,1,0),\n\n    new Vector3(.5,1.5,0),\n    new Vector3(0,1,0),\n    new Vector3(0,0,0),\n\n    new Vector3(1,1,0),\n    new Vector3(1,0,0),\n  ]\n]\n\nconst models : Record<Model, Vector3[][]> = {\n  smiley,\n  home\n};\n\n@Component({\n  selector: 'app-graphics-view',\n  standalone: true,\n  imports: [CommonModule],\n  template: `<canvas #canvasRef></canvas>`,\n  styleUrls: ['./graphics-view.component.css']\n})\nexport class GraphicsViewComponent implements OnInit, OnChanges {\n  @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;\n\n  @Input() matrices: Array<Matrix> = [];\n  @Input() selectedIndex = -1;\n  @Input() hoveredTransformation = -1;\n  @Input() axesVisible = false;\n  camera: FreeCamera;\n\n  private engine: WebGPUEngine;\n  private scene: Scene;\n\n  private lineMesh: Mesh;\n  private transformationMesh: Mesh;\n\n  private coordinateSystemMesh: AxesViewer;\n  private coordinateSystemInstances: AxesViewer[] = [];\n\n  constructor(private elRef: ElementRef) { }\n\n  @HostListener('window:resize')\n  resize(): void {\n    const rect = this.elRef.nativeElement.getBoundingClientRect();\n    this.canvasElement.nativeElement.width = rect.width;\n    this.canvasElement.nativeElement.height = rect.height;\n\n    const aspectRatio = rect.width / rect.height;\n\n    this.engine.resize(true);\n\n    this.camera.orthoTop = 5;\n    this.camera.orthoBottom = -5;\n    this.camera.orthoLeft = -5 * aspectRatio;\n    this.camera.orthoRight = 5 * aspectRatio;\n  }\n\n  private model : Model = 'smiley';\n\n  ngOnChanges(changes: SimpleChanges): void {\n    if (this.lineMesh) {\n      this.rebuildMatrixBuffer(models[this.model]);\n    }\n  }\n\n  rebuildMatrixBuffer(points: Vector3[][]) {\n    if (!this.lineMesh) {\n      return;\n    }\n\n    this.transformationMesh?.dispose();\n    this.coordinateSystemInstances.forEach(axis => axis.dispose());\n    this.coordinateSystemInstances = [];\n\n    const startStopColor = Color4.FromColor3(Color3.White());\n    const intermediateColor = Color4.FromColor3(Color3.Gray());\n\n    const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];\n\n    const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);\n    const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);\n\n    let previousMatrix = Matrix.Identity();\n    const lastIndex = matricesIncludingStart.length - 1;\n\n    const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {\n      previousMatrix = acc.matrixAcc;\n      acc.matrixAcc = acc.matrixAcc.multiply(matrix);\n      acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);\n\n      const rotationMatrix = acc.matrixAcc.getRotationMatrix();\n\n      if (this.axesVisible) {\n        const axes = this.coordinateSystemMesh.createInstance();\n        const pos = Vector3.TransformCoordinates(new Vector3(0, 0, 0), acc.matrixAcc)\n        const xAxis = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);\n        const yAxis = Vector3.TransformCoordinates(new Vector3(0, 1, 0), rotationMatrix);\n        axes.update(pos, xAxis, yAxis, new Vector3(1, 1, 1));\n        this.coordinateSystemInstances.push(axes);\n      }\n\n      ((matrixIndex === 0 || matrixIndex === lastIndex || this.hoveredTransformation === matrixIndex) ?\n        startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);\n\n      if (matrixIndex !== lastIndex) {\n        acc.lines.push(...points.flat().map(point => [\n          Vector3.TransformCoordinates(point, previousMatrix),\n          Vector3.TransformCoordinates(point, acc.matrixAcc),\n        ]))\n      \n        const selected = this.selectedIndex === matrixIndex -1;\n        const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());\n        const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());\n        \n        acc.lineColors.push(...points.flat().map(point => [startColor, endColor]));\n      }\n      return acc\n    }, {\n      matrixAcc: Matrix.Identity(),\n      matrixBuffer,\n      colorBuffer,\n      lines: [new Array<Vector3>()],\n      lineColors: [new Array<Color4>()]\n    });\n\n    if (matricesIncludingStart.length > 0) {\n      this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);\n      this.lineMesh.thinInstanceSetBuffer('color', colorBuffer, 4);\n    }\n\n    this.transformationMesh?.dispose();\n    this.transformationMesh = CreateLineSystem(\"transformation-lines\", {\n      lines: visualData.lines,\n      colors: visualData.lineColors\n    }, this.scene);\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  async ngOnInit() {\n    const canvas = this.canvasElement.nativeElement;\n    this.engine = new WebGPUEngine(canvas);\n    await this.engine.initAsync();\n\n    this.createScene();\n\n    this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);\n\n    this.coordinateSystemMesh = new AxesViewer(this.scene);\n    this.coordinateSystemMesh.zAxis.dispose();\n    [\n      this.coordinateSystemMesh.xAxis,\n      this.coordinateSystemMesh.yAxis\n    ].forEach(mesh => mesh.setEnabled(false));\n\n    this.rebuildMatrixBuffer(smiley);\n\n    this.resize();\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  createScene() {\n    this.scene = new Scene(this.engine);\n    this.camera = new FreeCamera(\"camera1\",\n      new Vector3(0, 0, -10),\n      this.scene);\n    this.camera.setTarget(Vector3.Zero());\n\n    this.camera.mode = Camera.ORTHOGRAPHIC_CAMERA;\n\n    this.engine.setDepthFunction(Engine.ALWAYS);\n\n    const renderingOrder = [\n      'transformation-lines',\n      'picture',\n    ];\n\n    this.scene.setRenderingOrder(0, undefined,\n      undefined,\n      (meshA, meshB) => {\n        const indexA = renderingOrder.indexOf(meshA.getMesh().name);\n        const indexB = renderingOrder.indexOf(meshB.getMesh().name);\n        if (indexA === indexB) return 0\n        else if (indexA > indexB) return 1\n        else return -1\n      }\n    );\n\n    //this.camera.attachControl(this.canvasElement.nativeElement, true);\n    const light = new HemisphericLight(\"light\",\n      new Vector3(0, 1, 0),\n      this.scene);\n    light.intensity = 0.7;\n    return this.scene;\n  }\n\n  setModel(model: Model) {\n    \n    this.model = model;\n    this.lineMesh?.dispose();\n    this.lineMesh = CreateLineSystem('picture', { lines: models[model] }, this.scene);\n\n    this.rebuildMatrixBuffer(models[model]);\n  }\n}",
+            "sourceCode": "import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';\nimport { CommonModule } from '@angular/common';\n\nimport { Scene } from '@babylonjs/core/scene';\n\nimport { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';\nimport { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';\nimport { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';\nimport { Mesh } from '@babylonjs/core/Meshes/mesh';\nimport { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';\n\nimport '@babylonjs/core/Meshes/thinInstanceMesh';\nimport '@babylonjs/core/Materials/standardMaterial';\nimport { Camera } from '@babylonjs/core/Cameras/camera';\nimport { Color3, Color4 } from '@babylonjs/core/Maths/math.color';\nimport { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';\nimport { AxesViewer } from '@babylonjs/core/Debug/axesViewer';\n\nimport \"@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha\"\nimport { Engine } from '@babylonjs/core/Engines/engine';\n\nconst MAT4_ELEMENT_COUNT = 16;\n\nexport type Model = 'home' | 'smiley';\n\n// const points = [\n//   new Vector3(0, 0, 0),\n//   new Vector3(1, 0, 0),\n//   new Vector3(1, 1, 0),\n//   new Vector3(0, 0, 0),\n// ];\n\nconst circleRes = 20;\n\nconst circle = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const phi = index * 2 * Math.PI / circleRes;\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0)\n});\n\nconst mouth = new Array(circleRes + 1).fill(0).map((val, index) => {\n  const minPhi = -Math.PI / 4;\n  const maxPhi = -3 * Math.PI / 4;\n  const phi = minPhi + (index / circleRes) * (maxPhi - minPhi);\n  return new Vector3(Math.cos(phi), Math.sin(phi), 0.0).scale(0.5)\n});\n\nconst smiley = [\n  circle,\n  circle.map(point => point.scale(0.25).add(new Vector3(0.4, 0.3, 0))),\n  circle.map(point => point.scale(0.25).add(new Vector3(-0.4, 0.3, 0))),\n  mouth\n];\n\nconst home = [\n  [\n    new Vector3(0,0,0),\n    new Vector3(1,0,0),\n    new Vector3(0,1,0),\n    new Vector3(1,1,0),\n\n    new Vector3(.5,1.5,0),\n    new Vector3(0,1,0),\n    new Vector3(0,0,0),\n\n    new Vector3(1,1,0),\n    new Vector3(1,0,0),\n  ]\n]\n\nconst models : Record<Model, Vector3[][]> = {\n  smiley,\n  home\n};\n\n@Component({\n  selector: 'app-graphics-view',\n  standalone: true,\n  imports: [CommonModule],\n  template: `<canvas #canvasRef></canvas>`,\n  styleUrls: ['./graphics-view.component.css']\n})\nexport class GraphicsViewComponent implements OnInit, OnChanges {\n  @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;\n\n  @Input() matrices: Array<Matrix> = [];\n\n  @Input() hoveredPicture = -1;  \n  @Input() hoveredTransformation = -1;\n\n  @Input() axesVisible = false;\n  camera: FreeCamera;\n\n  private engine: WebGPUEngine;\n  private scene: Scene;\n\n  private lineMesh: Mesh;\n  private transformationMesh: Mesh;\n\n  private coordinateSystemMesh: AxesViewer;\n  private coordinateSystemInstances: AxesViewer[] = [];\n\n  constructor(private elRef: ElementRef) { }\n\n  @HostListener('window:resize')\n  resize(): void {\n    const rect = this.elRef.nativeElement.getBoundingClientRect();\n    this.canvasElement.nativeElement.width = rect.width;\n    this.canvasElement.nativeElement.height = rect.height;\n\n    const aspectRatio = rect.width / rect.height;\n\n    this.engine.resize(true);\n\n    this.camera.orthoTop = 5;\n    this.camera.orthoBottom = -5;\n    this.camera.orthoLeft = -5 * aspectRatio;\n    this.camera.orthoRight = 5 * aspectRatio;\n  }\n\n  private model : Model = 'smiley';\n\n  ngOnChanges(changes: SimpleChanges): void {\n    if (this.lineMesh) {\n      this.rebuildMatrixBuffer(models[this.model]);\n    }\n  }\n\n  rebuildMatrixBuffer(points: Vector3[][]) {\n    if (!this.lineMesh) {\n      return;\n    }\n\n    this.transformationMesh?.dispose();\n    this.coordinateSystemInstances.forEach(axis => axis.dispose());\n    this.coordinateSystemInstances = [];\n\n    const startColor = Color4.FromColor3(Color3.Green());\n    const stopColor = Color4.FromColor3(Color3.Yellow());\n\n    const transformationStartColor = Color4.FromColor3(Color3.Blue());\n    const transformationEndColor = Color4.FromColor3(Color3.Red());\n\n    const highlightColor = Color4.FromColor3(Color3.Magenta());\n\n    const intermediateColor = Color4.FromColor3(Color3.Gray());\n\n    const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];\n\n    const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);\n    const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);\n\n    let previousMatrix = Matrix.Identity();\n    const lastIndex = matricesIncludingStart.length - 1;\n\n    const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {\n      previousMatrix = acc.matrixAcc;\n      acc.matrixAcc = acc.matrixAcc.multiply(matrix);\n      acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);\n\n      const rotationMatrix = acc.matrixAcc.getRotationMatrix();\n\n      if (this.axesVisible) {\n        const axes = this.coordinateSystemMesh.createInstance();\n        const pos = Vector3.TransformCoordinates(new Vector3(0, 0, 0), acc.matrixAcc)\n        const xAxis = Vector3.TransformCoordinates(new Vector3(1, 0, 0), rotationMatrix);\n        const yAxis = Vector3.TransformCoordinates(new Vector3(0, 1, 0), rotationMatrix);\n        axes.update(pos, xAxis, yAxis, new Vector3(1, 1, 1));\n        this.coordinateSystemInstances.push(axes);\n      }\n\n      const pictureColor = \n        this.hoveredPicture === matrixIndex ? highlightColor :\n        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex - 1 ? transformationStartColor :\n        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex  ? transformationEndColor :\n        matrixIndex === 0 ? startColor :\n        matrixIndex === lastIndex ? stopColor : intermediateColor;\n\n      pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);\n\n      if (matrixIndex !== lastIndex) {\n        acc.lines.push(...points.flat().map(point => [\n          Vector3.TransformCoordinates(point, previousMatrix),\n          Vector3.TransformCoordinates(point, acc.matrixAcc),\n        ]))\n      \n        const selected = this.hoveredTransformation === matrixIndex;\n        const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());\n        const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());\n        \n        acc.lineColors.push(...points.flat().map(point => [startColor, endColor]));\n      }\n      return acc\n    }, {\n      matrixAcc: Matrix.Identity(),\n      matrixBuffer,\n      colorBuffer,\n      lines: [new Array<Vector3>()],\n      lineColors: [new Array<Color4>()]\n    });\n\n    if (matricesIncludingStart.length > 0) {\n      this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);\n      this.lineMesh.thinInstanceSetBuffer('color', colorBuffer, 4);\n    }\n\n    this.transformationMesh?.dispose();\n    this.transformationMesh = CreateLineSystem(\"transformation-lines\", {\n      lines: visualData.lines,\n      colors: visualData.lineColors\n    }, this.scene);\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  async ngOnInit() {\n    const canvas = this.canvasElement.nativeElement;\n    this.engine = new WebGPUEngine(canvas);\n    await this.engine.initAsync();\n\n    this.createScene();\n\n    this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);\n\n    this.coordinateSystemMesh = new AxesViewer(this.scene);\n    this.coordinateSystemMesh.zAxis.dispose();\n    [\n      this.coordinateSystemMesh.xAxis,\n      this.coordinateSystemMesh.yAxis\n    ].forEach(mesh => mesh.setEnabled(false));\n\n    this.rebuildMatrixBuffer(smiley);\n\n    this.resize();\n    this.engine.beginFrame();\n    this.scene.render();\n    this.engine.endFrame();\n  }\n\n  createScene() {\n    this.scene = new Scene(this.engine);\n    this.camera = new FreeCamera(\"camera1\",\n      new Vector3(0, 0, -10),\n      this.scene);\n    this.camera.setTarget(Vector3.Zero());\n\n    this.camera.mode = Camera.ORTHOGRAPHIC_CAMERA;\n\n    this.engine.setDepthFunction(Engine.ALWAYS);\n\n    const renderingOrder = [\n      'transformation-lines',\n      'picture',\n    ];\n\n    this.scene.setRenderingOrder(0, undefined,\n      undefined,\n      (meshA, meshB) => {\n        const indexA = renderingOrder.indexOf(meshA.getMesh().name);\n        const indexB = renderingOrder.indexOf(meshB.getMesh().name);\n        if (indexA === indexB) return 0\n        else if (indexA > indexB) return 1\n        else return -1\n      }\n    );\n\n    //this.camera.attachControl(this.canvasElement.nativeElement, true);\n    const light = new HemisphericLight(\"light\",\n      new Vector3(0, 1, 0),\n      this.scene);\n    light.intensity = 0.7;\n    return this.scene;\n  }\n\n  setModel(model: Model) {\n    \n    this.model = model;\n    this.lineMesh?.dispose();\n    this.lineMesh = CreateLineSystem('picture', { lines: models[model] }, this.scene);\n\n    this.rebuildMatrixBuffer(models[model]);\n  }\n}",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -885,7 +885,7 @@
                         "deprecationMessage": ""
                     }
                 ],
-                "line": 98,
+                "line": 100,
                 "jsdoctags": [
                     {
                         "name": "elRef",
