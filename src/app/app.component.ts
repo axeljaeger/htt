@@ -50,11 +50,9 @@ export class AppComponent {
 }
   private fb = inject(FormBuilder);
   title = 'htt';
-  selectedIndex = 0;
-
+  
+  hoveredPicture = -1;
   hoveredTransformation = -1;
-
-
 
   matrixArray = this.fb.array([
     this.fb.control({
@@ -71,7 +69,7 @@ export class AppComponent {
 
   addTransformation(transformationType: TransformationType, index: number) {
     this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
-    this.select(index);
+    this.hoverTransformation(index);
   }
 
   drop(event: CdkDragDrop<TransformationEntry[]>) {
@@ -80,11 +78,7 @@ export class AppComponent {
     this.matrixArray.removeAt(event.previousIndex);
     this.matrixArray.insert(event.currentIndex, control);
 
-    this.select(event.currentIndex);
-  }
-
-  select(index: number): void {
-    this.selectedIndex = index;
+    this.hoverTransformation(event.currentIndex);
   }
 
   deleteTransformation(index: number): void {
@@ -115,7 +109,13 @@ export class AppComponent {
     return transformations.map((trans) => trans.matrix);
   }
 
-  hoverTransformation(event: number) {
-    this.hoveredTransformation = event;
+  hoverPicture(index: number) {
+    this.hoveredTransformation = -1
+    this.hoveredPicture = index;
+  }
+
+  hoverTransformation(index: number): void {
+    this.hoveredPicture = -1;
+    this.hoveredTransformation = index;
   }
 }
