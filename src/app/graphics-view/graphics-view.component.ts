@@ -83,8 +83,10 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;
 
   @Input() matrices: Array<Matrix> = [];
-  @Input() selectedIndex = -1;
+
+  @Input() hoveredPicture = -1;  
   @Input() hoveredTransformation = -1;
+
   @Input() axesVisible = false;
   camera: FreeCamera;
 
@@ -132,7 +134,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.coordinateSystemInstances.forEach(axis => axis.dispose());
     this.coordinateSystemInstances = [];
 
-    const startStopColor = Color4.FromColor3(Color3.White());
+    const startColor = Color4.FromColor3(Color3.Green());
+    const stopColor = Color4.FromColor3(Color3.Yellow());
+
+    const transformationStartColor = Color4.FromColor3(Color3.Blue());
+    const transformationEndColor = Color4.FromColor3(Color3.Red());
+
+    const highlightColor = Color4.FromColor3(Color3.Magenta());
+
     const intermediateColor = Color4.FromColor3(Color3.Gray());
 
     const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];
@@ -159,8 +168,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         this.coordinateSystemInstances.push(axes);
       }
 
-      ((matrixIndex === 0 || matrixIndex === lastIndex || this.hoveredTransformation === matrixIndex) ?
-        startStopColor : intermediateColor).toArray(acc.colorBuffer, matrixIndex * 4);
+      const pictureColor = 
+        this.hoveredPicture === matrixIndex ? highlightColor :
+        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex - 1 ? transformationStartColor :
+        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex  ? transformationEndColor :
+        matrixIndex === 0 ? startColor :
+        matrixIndex === lastIndex ? stopColor : intermediateColor;
+
+      pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
 
       if (matrixIndex !== lastIndex) {
         acc.lines.push(...points.flat().map(point => [
@@ -168,7 +183,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
           Vector3.TransformCoordinates(point, acc.matrixAcc),
         ]))
       
-        const selected = this.selectedIndex === matrixIndex -1;
+        const selected = this.hoveredTransformation === matrixIndex;
         const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());
         const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());
         

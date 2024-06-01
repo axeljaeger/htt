@@ -3,9 +3,9 @@
   flex-direction: row;
   border-radius: 15px;
   justify-content: center;
-  background-color: aliceblue;
+  background-color: gray;
   opacity: 0.33;
-
+  width: 1ex;
   transition:
     opacity 0.4s;
 }
@@ -24,7 +24,7 @@ div.button-container {
   justify-content: center;
   margin: 0 -3ex;
   z-index: 10;
-  gap: 1ex;
+  gap: 1ex; 
 }
 
 :host:hover {
@@ -35,7 +35,6 @@ div.button-container {
   }
 
   button:hover {
-    background-color: red;
     visibility: visible;
   }
 }
