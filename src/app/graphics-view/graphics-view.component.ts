@@ -9,15 +9,24 @@ import { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 
+
+// If this line is in, it works.
+// import '@babylonjs/core';
+
+// Note that this line is not sufficient to make it work.
+import '@babylonjs/core/Engines/Extensions/engine.rawTexture';
 import '@babylonjs/core/Meshes/thinInstanceMesh';
 import '@babylonjs/core/Materials/standardMaterial';
+import '@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha';
+
 import { Camera } from '@babylonjs/core/Cameras/camera';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder';
 import { AxesViewer } from '@babylonjs/core/Debug/axesViewer';
 
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha"
 import { Engine } from '@babylonjs/core/Engines/engine';
+import { CreateGreasedLine } from '@babylonjs/core/Meshes/Builders/greasedLineBuilder';
+import { createPalette } from 'hue-map';
 
 const MAT4_ELEMENT_COUNT = 16;
 
@@ -71,6 +80,19 @@ const models : Record<Model, Vector3[][]> = {
   smiley,
   home
 };
+
+const lightBackgroundColor = '#f0f0f0'
+const darkBackgroundColor = 'aaaaaa';
+
+const lightContrastColor = '#888888'
+
+const colorMix = (start: Color3, end: Color3, t: number) => new Color3(
+  start.r * t + end.r * (1 - t),
+  start.g * t + end.g * (1 - t),
+  start.b * t + end.b * (1 - t)
+);
+
+const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, color.g, color.b, alpha);
 
 @Component({
   selector: 'app-graphics-view',
@@ -146,11 +168,25 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];
 
-    const matrixBuffer = new Float32Array(matricesIncludingStart.length * MAT4_ELEMENT_COUNT);
-    const colorBuffer = new Float32Array(matricesIncludingStart.length * 4);
+    const matrixCount = matricesIncludingStart.length
+
+    const matrixBuffer = new Float32Array(matrixCount * MAT4_ELEMENT_COUNT);
+    const colorBuffer = new Float32Array(matrixCount * 4);
 
     let previousMatrix = Matrix.Identity();
-    const lastIndex = matricesIncludingStart.length - 1;
+    const lastIndex = matrixCount - 1;
+
+    const colors = createPalette({
+      map: 'viridis',
+      steps: matrixCount,
+    }).format('float');
+
+    const currentColor = new Color4();
+
+    const pictureSelected = this.hoveredPicture !== -1;
+    const transformationSelected = this.hoveredTransformation !== -1;
+
+    const colorTable = colors.map(color => Color3.FromArray(color));
 
     const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {
       previousMatrix = acc.matrixAcc;
@@ -158,6 +194,8 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
 
       const rotationMatrix = acc.matrixAcc.getRotationMatrix();
+
+      Color4.FromArrayToRef(colors[matrixIndex], 0, currentColor);
 
       if (this.axesVisible) {
         const axes = this.coordinateSystemMesh.createInstance();
@@ -168,13 +206,11 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         this.coordinateSystemInstances.push(axes);
       }
 
-      const pictureColor = 
-        this.hoveredPicture === matrixIndex ? highlightColor :
-        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex - 1 ? transformationStartColor :
-        this.hoveredTransformation > -1 && this.hoveredTransformation === matrixIndex  ? transformationEndColor :
-        matrixIndex === 0 ? startColor :
-        matrixIndex === lastIndex ? stopColor : intermediateColor;
-
+      const pictureAlpha = 
+        this.hoveredPicture === matrixIndex ? 0.8 : 
+        pictureSelected ? 0.1 : 
+        0.2;
+      const pictureColor = currentColor.multiply(new Color4(1,1,1, pictureAlpha));
       pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
 
       if (matrixIndex !== lastIndex) {
@@ -184,10 +220,21 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         ]))
       
         const selected = this.hoveredTransformation === matrixIndex;
-        const startColor = Color4.FromColor3(selected ? Color3.Blue() : Color3.Gray());
-        const endColor = Color4.FromColor3(selected ? Color3.Red() : Color3.Gray());
         
-        acc.lineColors.push(...points.flat().map(point => [startColor, endColor]));
+        const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
+        
+        
+
+        
+        const alpha = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
+          
+        const startColor = colorTable[matrixIndex+1];
+        const endColor = colorTable[matrixIndex];
+      
+        acc.lineColors.push(...points.flat().map(point => [
+          color4WithAlpha(colorMix(startColor, Color3.FromHexString(lightContrastColor), 0.5), alpha), 
+          color4WithAlpha(colorMix(endColor, Color3.FromHexString(lightContrastColor), 0.5), alpha)]
+        ));
       }
       return acc
     }, {
@@ -208,6 +255,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       lines: visualData.lines,
       colors: visualData.lineColors
     }, this.scene);
+
+    this.transformationMesh.alphaIndex = 1;
+
     this.engine.beginFrame();
     this.scene.render();
     this.engine.endFrame();
@@ -220,7 +270,14 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     this.createScene();
 
-    this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);
+    // this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);
+    
+    this.lineMesh = CreateGreasedLine('picture', { points: smiley }, {
+      // color: Color3.Red(), 
+    }, this.scene);
+    
+    this.lineMesh.material.alpha = 0.9;
+    this.lineMesh.alphaIndex = 0;
 
     this.coordinateSystemMesh = new AxesViewer(this.scene);
     this.coordinateSystemMesh.zAxis.dispose();
@@ -269,6 +326,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       new Vector3(0, 1, 0),
       this.scene);
     light.intensity = 0.7;
+    this.scene.clearColor = Color4.FromHexString(lightBackgroundColor);
     return this.scene;
   }
 

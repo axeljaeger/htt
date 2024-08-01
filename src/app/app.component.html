@@ -13,13 +13,13 @@
     @for (alias of matrixArray.controls; track alias; let i = $index) {
     @if ($first) {
       <div class="math" before>x' =</div>
-      <app-add-transformations (addTransformation)="addTransformation($event,i)" (mouseover)="hoverPicture(i)"
+      <app-add-transformations [color]="colors[i]" (addTransformation)="addTransformation($event,i)" (mouseover)="hoverPicture(i)"
       (mouseout)="hoverPicture(-1)"></app-add-transformations>
     }
       <app-matrix [formControlName]="i"  [class.selected]="hoveredTransformation === i" (mouseover)="hoverTransformation(i)"
       (mouseout)="hoverTransformation(-1)">
       </app-matrix>
-    <app-add-transformations (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverPicture(i+1)"
+    <app-add-transformations [color]="colors[i+1]" (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverPicture(i+1)"
       (mouseout)="hoverPicture(-1)" />
       @if ($last) {
       <div class="math" after style="display: flex; flex-direction: row;">x

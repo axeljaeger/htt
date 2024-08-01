@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "^18.0.3",
     "@angular/router": "^18.0.3",
     "@web/test-runner": "^0.18.0",
+    "hue-map": "^1.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.6.2",
     "zone.js": "~0.14.2"
@@ -42,6 +43,7 @@
     "@storybook/angular": "^8.1.5",
     "@storybook/blocks": "^8.1.5",
     "@storybook/test": "^8.1.5",
+    "@types/colormap": "^2.3.4",
     "@types/jasmine": "~4.3.0",
     "jasmine-core": "~4.5.0",
     "storybook": "^8.1.5",

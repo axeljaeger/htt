@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import {
   DragDropModule,
@@ -6,7 +6,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {MatButtonToggleChange, MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 
 import { AsyncPipe } from '@angular/common';
 import {
@@ -18,6 +18,7 @@ import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
+import { createPalette } from 'hue-map';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
@@ -42,17 +43,22 @@ export interface TransformationEntry {
 
   ],
 })
-export class AppComponent {
-  axesVisible : false;
+export class AppComponent implements OnInit {
+  ngOnInit(): void {
+    this.calculateColors();
+  }
+  axesVisible: false;
 
   setAxesVisible($event: MatButtonToggleChange) {
-  this.axesVisible = $event.value.includes('axes');
-}
+    this.axesVisible = $event.value.includes('axes');
+  }
   private fb = inject(FormBuilder);
   title = 'htt';
-  
+
   hoveredPicture = -1;
   hoveredTransformation = -1;
+
+  public colors = [] as string[];
 
   matrixArray = this.fb.array([
     this.fb.control({
@@ -70,6 +76,16 @@ export class AppComponent {
   addTransformation(transformationType: TransformationType, index: number) {
     this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
     this.hoverTransformation(index);
+
+    this.calculateColors();
+  }
+  calculateColors() {
+    const matrixCount = this.matrixArray.length + 1;
+
+    this.colors = createPalette({
+      map: 'viridis',
+      steps: matrixCount,
+    }).format('cssHex');
   }
 
   drop(event: CdkDragDrop<TransformationEntry[]>) {
@@ -83,6 +99,7 @@ export class AppComponent {
 
   deleteTransformation(index: number): void {
     this.matrixArray.removeAt(index);
+    this.calculateColors();
   }
 
   initialValue(transformationType: TransformationType): TransformationEntry {
