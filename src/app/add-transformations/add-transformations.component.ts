@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, Input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -18,6 +18,11 @@ export enum TransformationType {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransformationsComponent {
+  @HostBinding('style.backgroundColor') backgroundColor = 'lightblue';
+  @Input() set color(val : string) {
+    this.backgroundColor = val;
+  }
+
   public TransformationType = TransformationType;
   public addTransformation = output<TransformationType>();
 }
