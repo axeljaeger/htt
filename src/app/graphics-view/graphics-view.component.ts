@@ -9,12 +9,7 @@ import { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine';
 
-
-// If this line is in, it works.
-// import '@babylonjs/core';
-
-// Note that this line is not sufficient to make it work.
-import '@babylonjs/core/Engines/Extensions/engine.rawTexture';
+import '@babylonjs/core/Engines/WebGPU/Extensions/engine.rawTexture';
 import '@babylonjs/core/Meshes/thinInstanceMesh';
 import '@babylonjs/core/Materials/standardMaterial';
 import '@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha';
