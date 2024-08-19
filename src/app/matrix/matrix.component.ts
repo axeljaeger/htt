@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Output, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
 import { MatSliderModule } from '@angular/material/slider';
 import { TransformationEntry } from '../app.component';
-import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { map, startWith, withLatestFrom } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, merge } from 'rxjs';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { Angle } from '@babylonjs/core/Maths/math.path';
 import { LetDirective } from '@ngrx/component';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { TransformationType } from '../add-transformations/add-transformations.component';
 
 
 enum MatrixElement {
@@ -42,7 +43,7 @@ enum Dimension {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatrixComponent implements OnInit, ControlValueAccessor {
-  @Input() matrixItem: TransformationEntry;
+  @Input() matrixItem: TransformationEntry = { transformationType: TransformationType.Translation, matrix: Matrix.Identity()};
 
   public MatrixElement = MatrixElement;
   public Dimension = Dimension;
@@ -55,6 +56,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   prevMatrix = Matrix.Identity();
 
+  @Output() deleteMatrix = new EventEmitter<void>();
   @Output() matrix = combineLatest(
     [ this.slider.valueChanges, 
       this.affectedDimensions$
