@@ -1,6 +1,6 @@
 <div class="header">
     <div class="dragHandle" cdkDragHandle>{{matrixItem.transformationType}}</div>
-    <div class="deleteArea" >
+    <div class="deleteArea" (click)="deleteMatrix.next()">
       <mat-icon class="deleteIcon">delete</mat-icon>
     </div>
   </div>
