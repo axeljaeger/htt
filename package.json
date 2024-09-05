@@ -33,7 +33,7 @@
     "@angular/cli": "~18.2.3",
     "@angular/compiler-cli": "^18.2.3",
     "@babylonjs/core": "^7.23.0",
-    "@chromatic-com/storybook": "^1.5.0",
+    "@chromatic-com/storybook": "^1.8.0",
     "@compodoc/compodoc": "^1.1.25",
     "@ngrx/component": "^18.0.0",
     "@storybook/addon-docs": "^8.2.9",
