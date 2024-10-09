@@ -110,8 +110,8 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private engine: WebGPUEngine;
   private scene: Scene;
 
-  private lineMesh: Mesh;
   private transformationMesh: Mesh;
+  private pictureMeshes: Mesh[] = [];
 
   private coordinateSystemMesh: AxesViewer;
   private coordinateSystemInstances: AxesViewer[] = [];
@@ -137,17 +137,18 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private model : Model = 'smiley';
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.lineMesh) {
-      this.rebuildMatrixBuffer(models[this.model]);
-    }
+    this.rebuildMatrixBuffer(models[this.model]);
   }
 
   rebuildMatrixBuffer(points: Vector3[][]) {
-    if (!this.lineMesh) {
+    if (!this.scene) {
       return;
     }
 
     this.transformationMesh?.dispose();
+    this.pictureMeshes.forEach(mesh => mesh.dispose());
+    this.pictureMeshes = [];
+
     this.coordinateSystemInstances.forEach(axis => axis.dispose());
     this.coordinateSystemInstances = [];
 
@@ -183,10 +184,13 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const colorTable = colors.map(color => Color3.FromArray(color));
 
+    // Add first element
+    this.pictureMeshes.push(CreateGreasedLine(`picture-initial`, { points }, { color: colorTable[colorTable.length - 1] }, this.scene));
+
     const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {
       previousMatrix = acc.matrixAcc;
       acc.matrixAcc = acc.matrixAcc.multiply(matrix);
-      acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
+      // acc.matrixAcc.copyToArray(acc.matrixBuffer, matrixIndex * MAT4_ELEMENT_COUNT);
 
       const rotationMatrix = acc.matrixAcc.getRotationMatrix();
 
@@ -206,7 +210,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         pictureSelected ? 0.1 : 
         0.2;
       const pictureColor = currentColor.multiply(new Color4(1,1,1, pictureAlpha));
-      pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
+      // pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
 
       if (matrixIndex !== lastIndex) {
         acc.lines.push(...points.flat().map(point => [
@@ -218,8 +222,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         
         const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
         
-        
-
+        const xpoints = points.map(line => line.map(point => Vector3.TransformCoordinates(point, acc.matrixAcc)));
+        const color = new Color3(pictureColor.r, pictureColor.g, pictureColor.b);
+        this.pictureMeshes.push(CreateGreasedLine(`picture-${matrixIndex}`, { points: xpoints }, { color }, this.scene));
         
         const alpha = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
           
@@ -234,16 +239,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       return acc
     }, {
       matrixAcc: Matrix.Identity(),
-      matrixBuffer,
-      colorBuffer,
       lines: [new Array<Vector3>()],
       lineColors: [new Array<Color4>()]
     });
-
-    if (matricesIncludingStart.length > 0) {
-      this.lineMesh.thinInstanceSetBuffer('matrix', matrixBuffer);
-      this.lineMesh.thinInstanceSetBuffer('color', colorBuffer, 4);
-    }
 
     this.transformationMesh?.dispose();
     this.transformationMesh = CreateLineSystem("transformation-lines", {
@@ -263,17 +261,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     this.engine = new WebGPUEngine(canvas);
     await this.engine.initAsync();
 
-    this.createScene();
-
-    // this.lineMesh = CreateLineSystem('picture', { lines: smiley }, this.scene);
-    
-    this.lineMesh = CreateGreasedLine('picture', { points: smiley }, {
-      // color: Color3.Red(), 
-    }, this.scene);
-    
-    this.lineMesh.material.alpha = 0.9;
-    this.lineMesh.alphaIndex = 0;
-
+    this.createScene(); 
     this.coordinateSystemMesh = new AxesViewer(this.scene);
     this.coordinateSystemMesh.zAxis.dispose();
     [
@@ -281,7 +269,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       this.coordinateSystemMesh.yAxis
     ].forEach(mesh => mesh.setEnabled(false));
 
-    this.rebuildMatrixBuffer(smiley);
+    this.setModel('smiley');
 
     this.resize();
     this.engine.beginFrame();
@@ -326,11 +314,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   }
 
   setModel(model: Model) {
-    
     this.model = model;
-    this.lineMesh?.dispose();
-    this.lineMesh = CreateLineSystem('picture', { lines: models[model] }, this.scene);
-
     this.rebuildMatrixBuffer(models[model]);
   }
 }
