@@ -45,7 +45,7 @@
     "@storybook/test": "^8.1.5",
     "@types/colormap": "^2.3.4",
     "@types/jasmine": "~4.3.0",
-    "jasmine-core": "~4.5.0",
+    "jasmine-core": "~5.4.0",
     "storybook": "^8.1.5",
     "typescript": "^5.5.4"
   }
