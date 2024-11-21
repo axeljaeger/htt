@@ -96,15 +96,19 @@ mat-slider {
   opacity: 0;
 }
 
+span {
+  min-width: 6ex;
+  text-align: center;
+  padding: .25ex .25ex;
+}
+
 span.highlight {
   border-radius: 1ex;
   font-weight: bold;
-  padding: .25ex 1ex;
 }
 
 span.selected {
   background-color: rgb(216, 132, 209);
   border-radius: 1ex;
   font-weight: bold;
-  padding: .25ex 1ex;
 }

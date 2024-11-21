@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostBinding, Input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, HostBinding, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -12,16 +12,18 @@ export enum TransformationType {
 @Component({
   selector: 'app-add-transformations',
   standalone: true,
-  imports: [CommonModule, MatButtonModule],
+  imports: [ CommonModule, MatButtonModule ],
   templateUrl: './add-transformations.component.html',
   styleUrls: ['./add-transformations.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransformationsComponent {
   @HostBinding('style.backgroundColor') backgroundColor = 'lightblue';
-  @Input() set color(val : string) {
-    this.backgroundColor = val;
-  }
+  color = input<string>();
+
+  updateCss = effect(() => {
+    this.backgroundColor = this.color();
+  });
 
   public TransformationType = TransformationType;
   public addTransformation = output<TransformationType>();

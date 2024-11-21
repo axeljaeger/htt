@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, input, OnChanges, OnInit, SimpleChanges, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
@@ -97,14 +97,13 @@ const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, co
   styleUrls: ['./graphics-view.component.css']
 })
 export class GraphicsViewComponent implements OnInit, OnChanges {
-  @ViewChild('canvasRef', { static: true }) canvasElement: ElementRef;
+  canvasElement = viewChild<ElementRef>('canvasRef');
 
-  @Input() matrices: Array<Matrix> = [];
+  matrices = input<Array<Matrix>>([]);
 
-  @Input() hoveredPicture = -1;  
-  @Input() hoveredTransformation = -1;
-
-  @Input() axesVisible = false;
+  hoveredPicture = input(-1);  
+  hoveredTransformation = input(-1);
+  axesVisible = input(false);
   camera: FreeCamera;
 
   private engine: WebGPUEngine;
@@ -116,13 +115,13 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private coordinateSystemMesh: AxesViewer;
   private coordinateSystemInstances: AxesViewer[] = [];
 
-  constructor(private elRef: ElementRef) { }
+  private elRef = inject(ElementRef);
 
   @HostListener('window:resize')
   resize(): void {
     const rect = this.elRef.nativeElement.getBoundingClientRect();
-    this.canvasElement.nativeElement.width = rect.width;
-    this.canvasElement.nativeElement.height = rect.height;
+    this.canvasElement().nativeElement.width = rect.width;
+    this.canvasElement().nativeElement.height = rect.height;
 
     const aspectRatio = rect.width / rect.height;
 
@@ -162,7 +161,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const intermediateColor = Color4.FromColor3(Color3.Gray());
 
-    const matricesIncludingStart = [...this.matrices ?? [], Matrix.Identity()];
+    const matricesIncludingStart = [...this.matrices() ?? [], Matrix.Identity()];
 
     const matrixCount = matricesIncludingStart.length
 
@@ -179,13 +178,17 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const currentColor = new Color4();
 
-    const pictureSelected = this.hoveredPicture !== -1;
-    const transformationSelected = this.hoveredTransformation !== -1;
+    const pictureSelected = this.hoveredPicture() !== -1;
+    const transformationSelected = this.hoveredTransformation() !== -1;
 
     const colorTable = colors.map(color => Color3.FromArray(color));
 
+
+    const firstPictureAlpha = this.hoveredPicture() === colorTable.length - 1 ? 0.8 : pictureSelected ? 0.1 : 0.2;
+    const firstPictureColor = Color3.Lerp(Color3.FromHexString(lightBackgroundColor), colorTable[colorTable.length - 1], firstPictureAlpha);
+
     // Add first element
-    this.pictureMeshes.push(CreateGreasedLine(`picture-initial`, { points }, { color: colorTable[colorTable.length - 1] }, this.scene));
+    this.pictureMeshes.push(CreateGreasedLine(`picture-initial`, { points }, { color: firstPictureColor }, this.scene));
 
     const visualData = matricesIncludingStart.reduceRight((acc, matrix, matrixIndex) => {
       previousMatrix = acc.matrixAcc;
@@ -206,10 +209,20 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       }
 
       const pictureAlpha = 
-        this.hoveredPicture === matrixIndex ? 0.8 : 
+        this.hoveredPicture() === matrixIndex ? 0.8 : 
         pictureSelected ? 0.1 : 
         0.2;
-      const pictureColor = currentColor.multiply(new Color4(1,1,1, pictureAlpha));
+
+      console.log('hoveredPicture', this.hoveredPicture);
+      console.log('matrixIndex', matrixIndex);
+      console.log('pictureSelected', pictureSelected);
+      console.log('pictureAlpha', pictureAlpha);
+
+      // Use Color3.Lerp
+
+
+      const color3 = new Color3(currentColor.r, currentColor.g, currentColor.b);
+      const pictureColor = Color3.Lerp(Color3.FromHexString(lightBackgroundColor), color3, pictureAlpha);
       // pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
 
       if (matrixIndex !== lastIndex) {
@@ -218,13 +231,12 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
           Vector3.TransformCoordinates(point, acc.matrixAcc),
         ]))
       
-        const selected = this.hoveredTransformation === matrixIndex;
+        const selected = this.hoveredTransformation() === matrixIndex;
         
         const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
         
         const xpoints = points.map(line => line.map(point => Vector3.TransformCoordinates(point, acc.matrixAcc)));
-        const color = new Color3(pictureColor.r, pictureColor.g, pictureColor.b);
-        this.pictureMeshes.push(CreateGreasedLine(`picture-${matrixIndex}`, { points: xpoints }, { color }, this.scene));
+        this.pictureMeshes.push(CreateGreasedLine(`picture-${matrixIndex}`, { points: xpoints }, { color: pictureColor }, this.scene));
         
         const alpha = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
           
@@ -257,7 +269,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   }
 
   async ngOnInit() {
-    const canvas = this.canvasElement.nativeElement;
+    const canvas = this.canvasElement().nativeElement;
     this.engine = new WebGPUEngine(canvas);
     await this.engine.initAsync();
 
