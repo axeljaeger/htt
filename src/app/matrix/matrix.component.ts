@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
@@ -43,7 +43,7 @@ enum Dimension {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatrixComponent implements OnInit, ControlValueAccessor {
-  @Input() matrixItem: TransformationEntry = { transformationType: TransformationType.Translation, matrix: Matrix.Identity()};
+  matrixItem = input<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
 
   public MatrixElement = MatrixElement;
   public Dimension = Dimension;
@@ -63,7 +63,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
     ]
   ).pipe(
     map(([slider, dimensions]) => {
-      switch (this.matrixItem.transformationType) {
+      switch (this.matrixItem().transformationType) {
         case 'Translation': {
           const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;
           const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;
@@ -118,7 +118,6 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(obj: TransformationEntry): void {
-    this.matrixItem = obj;
     switch (obj.transformationType) {
       case 'Rotation': {
         const rotationMatrix = obj.matrix.getRotationMatrix();
@@ -155,7 +154,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit(): void {    
     this.matrix.subscribe(matrix => {
-      const val = {transformationType: this.matrixItem.transformationType, matrix}
+      const val = {transformationType: this.matrixItem().transformationType, matrix}
       this.onChange(val);
     });
   }

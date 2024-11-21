@@ -1,5 +1,5 @@
 <div class="header">
-    <div class="dragHandle" cdkDragHandle>{{matrixItem.transformationType}}</div>
+    <div class="dragHandle" cdkDragHandle>{{matrixItem().transformationType}}</div>
     <div class="deleteArea" (click)="deleteMatrix.next()">
       <mat-icon class="deleteIcon">delete</mat-icon>
     </div>
@@ -10,7 +10,7 @@
         dimensions: affectedDimensions$,
         m: matrix,
         } as shared">
-        @switch (matrixItem?.transformationType) {
+        @switch (matrixItem().transformationType) {
             @case ('Translation') {
                 <span>1</span>
                 <span>0</span>
@@ -66,8 +66,8 @@
 
 </div>
 
-@if (matrixItem?.transformationType === 'Rotation') {
-    <mat-slider discrete [displayWith]="formatRotationLabel" class="sliders" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
+@if (matrixItem().transformationType === 'Rotation') {
+    <mat-slider discrete [displayWith]="formatRotationLabel" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
         <input matSliderThumb [formControl]="slider">
     </mat-slider>
 } @else {
