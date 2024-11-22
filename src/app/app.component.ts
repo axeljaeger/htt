@@ -26,22 +26,21 @@ export interface TransformationEntry {
 }
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  standalone: true,
-  imports: [
-    DragDropModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    AsyncPipe,
-    AddTransformationsComponent,
-    GraphicsViewComponent,
-    MatrixComponent,
-    ReactiveFormsModule,
-
-  ],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    imports: [
+        DragDropModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatIconModule,
+        AsyncPipe,
+        AddTransformationsComponent,
+        GraphicsViewComponent,
+        MatrixComponent,
+        ReactiveFormsModule
+    ],
+    standalone: true
 })
 export class AppComponent implements OnInit {
   ngOnInit(): void {

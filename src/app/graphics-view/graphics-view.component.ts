@@ -90,11 +90,11 @@ const colorMix = (start: Color3, end: Color3, t: number) => new Color3(
 const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, color.g, color.b, alpha);
 
 @Component({
-  selector: 'app-graphics-view',
-  standalone: true,
-  imports: [CommonModule],
-  template: `<canvas #canvasRef></canvas>`,
-  styleUrls: ['./graphics-view.component.css']
+    selector: 'app-graphics-view',
+    imports: [CommonModule],
+    template: `<canvas #canvasRef></canvas>`,
+    styleUrls: ['./graphics-view.component.css'],
+    standalone: true
 })
 export class GraphicsViewComponent implements OnInit, OnChanges {
   canvasElement = viewChild<ElementRef>('canvasRef');
