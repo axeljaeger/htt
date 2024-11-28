@@ -13,4 +13,7 @@ export const Primary: Story = {
   parameters: {
     layout: 'centered',
   },
+  args: {
+    color: 'lightblue'
+  }
 };
