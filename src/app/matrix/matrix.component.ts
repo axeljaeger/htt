@@ -1,17 +1,15 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
 import { MatSliderModule } from '@angular/material/slider';
 import { TransformationEntry } from '../app.component';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest } from 'rxjs';
 import { Angle } from '@babylonjs/core/Maths/math.path';
-import { LetDirective } from '@ngrx/component';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { TransformationType } from '../add-transformations/add-transformations.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 
 enum MatrixElement {
@@ -30,7 +28,7 @@ enum Dimension {
   selector: 'app-matrix',
   standalone: true,
   hostDirectives: [CdkDrag],
-  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],
+  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, MatIconModule, CdkDragHandle],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.css'],
   providers: [
@@ -42,73 +40,88 @@ enum Dimension {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MatrixComponent implements OnInit, ControlValueAccessor {
+export class MatrixComponent implements ControlValueAccessor {
+  // Mostly used for storybook, actual application uses ControlValueAccessor
+  // Rework so that storybook to use form wrapper
   matrixItem = input<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
+
+  transformationType = signal<TransformationType>(TransformationType.Translation);
+  matrixContent = signal<Matrix>(Matrix.Identity());
+
+  debugItem = effect(() => { console.log("MatrixItem: ", this.matrixItem()) });
 
   public MatrixElement = MatrixElement;
   public Dimension = Dimension;
 
-  affectedDimensions$ = new BehaviorSubject<Dimension[]>([Dimension.x]);
+  affectedDimensions = signal<Dimension[]>([Dimension.x]);
 
   slider = new FormControl(0);
 
   // combineLatest with affectedDimensions
 
   prevMatrix = Matrix.Identity();
+  deleteMatrix = output<void>();
+  
+  sliderVal = toSignal(this.slider.valueChanges);
 
-  @Output() deleteMatrix = new EventEmitter<void>();
-  @Output() matrix = combineLatest(
-    [ this.slider.valueChanges, 
-      this.affectedDimensions$
-    ]
-  ).pipe(
-    map(([slider, dimensions]) => {
-      switch (this.matrixItem().transformationType) {
+  // FIXME: Use linkedSignal for initial value?
+  calcMatrix = effect(() => {
+    console.log("matrixContent: ", this.matrixContent());
+
+      switch (this.transformationType()) {
         case 'Translation': {
-          const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;
-          const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;
+          const tx = this.affectedDimensions().includes(Dimension.x) ? this.sliderVal() : this.prevMatrix.getTranslation().x;
+          const ty = this.affectedDimensions().includes(Dimension.y) ? this.sliderVal() : this.prevMatrix.getTranslation().y;
           const newMatrix = Matrix.Translation(tx,ty,0);
           this.prevMatrix = newMatrix
-          return newMatrix;
+          this.matrixContent.set(newMatrix);
+          break;
         };
 
         case 'Rotation': {
-          return Matrix.RotationZ(Angle.FromDegrees(slider).radians())
+          const newMatrix = Matrix.RotationZ(Angle.FromDegrees(this.sliderVal()).radians());
+          this.prevMatrix = newMatrix
+          this.matrixContent.set(newMatrix);
+          break;
         };
 
         case 'Scaling': {
-          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).x;
-          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).y;
-
+          const sx = this.affectedDimensions().includes(Dimension.x) ? this.sliderVal() : this.prevMatrix.getRow(0).x;
+          const sy = this.affectedDimensions().includes(Dimension.y) ? this.sliderVal() : this.prevMatrix.getRow(1).y;
           const newMatrix = Matrix.Scaling(sx,sy,0);
           this.prevMatrix = newMatrix
-
-          return newMatrix;
+          this.matrixContent.set(newMatrix);
+          break;
         };
 
         case 'Shearing': {
-          const sx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getRow(0).y;
-          const sy = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getRow(1).x;
+          const sx = this.affectedDimensions().includes(Dimension.x) ? this.sliderVal() : this.prevMatrix.getRow(0).y;
+          const sy = this.affectedDimensions().includes(Dimension.y) ? this.sliderVal() : this.prevMatrix.getRow(1).x;
 
           const newMatrix = Matrix.Identity();
           newMatrix.setRowFromFloats(0, 1, sx, 0, 0);
           newMatrix.setRowFromFloats(1, sy, 1, 0, 0);
           this.prevMatrix = newMatrix
-          return newMatrix;
+          this.matrixContent.set(newMatrix);
+          break;
         };
 
         default:
-          return Matrix.Identity();
+          this.matrixContent.set(Matrix.Identity())
       }
-    })).pipe(startWith(Matrix.Identity()));
-  
-  
+
+      const val = {transformationType: this.matrixItem().transformationType, matrix: this.matrixContent()}
+      this.onChange(val);
+    }, {
+      allowSignalWrites: true, // Enable writing to signals inside effects
+    });
+
   clickAffectedDimension(dimension: Dimension, event: MouseEvent) {
-    const affectedDimensions = this.affectedDimensions$.value;
+    const affectedDimensions = this.affectedDimensions();
     if (affectedDimensions.includes(dimension)) {
-      this.affectedDimensions$.next(affectedDimensions.filter(d => d !== dimension));
+      this.affectedDimensions.set(affectedDimensions.filter(d => d !== dimension));
     } else {
-      this.affectedDimensions$.next([...affectedDimensions, dimension]);
+      this.affectedDimensions.set([...affectedDimensions, dimension]);
     }
   }
 
@@ -118,6 +131,11 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(obj: TransformationEntry): void {
+    console.log("write value: ", obj);
+
+    this.transformationType.set(obj.transformationType);
+    this.matrixContent.set(obj.matrix);
+
     switch (obj.transformationType) {
       case 'Rotation': {
         const rotationMatrix = obj.matrix.getRotationMatrix();
@@ -150,12 +168,5 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
   }
   setDisabledState?(isDisabled: boolean): void {
     // throw new Error('Method not implemented.');
-  }
-
-  ngOnInit(): void {    
-    this.matrix.subscribe(matrix => {
-      const val = {transformationType: this.matrixItem().transformationType, matrix}
-      this.onChange(val);
-    });
   }
 }

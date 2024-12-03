@@ -59,7 +59,10 @@
   padding: 0ex 1ex;
 }
 
-.deleteArea {
+.deleteIcon {
+  font-size: 1.0em;
+  height: 1.2em;
+  width: 1.1em;
   display:flex;
   border-radius: 0px 15px 15px 0px;
   cursor: pointer;
@@ -67,17 +70,10 @@
   padding: 0 0.75ex 0 0.5ex;
   align-items: center;
 }
-.deleteArea:hover {
-  background-color: red;
-  .deleteIcon {
-      color: white;
-  }
-}
 
-.deleteIcon {
-  font-size: 1.0em;
-  height: 1.0em;
-  width: 1.0em;
+.deleteIcon:hover {
+  background-color: red;
+  color: white;
 }
 
 :host:hover {

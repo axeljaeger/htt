@@ -213,13 +213,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         pictureSelected ? 0.1 : 
         0.2;
 
-      console.log('hoveredPicture', this.hoveredPicture);
-      console.log('matrixIndex', matrixIndex);
-      console.log('pictureSelected', pictureSelected);
-      console.log('pictureAlpha', pictureAlpha);
-
       // Use Color3.Lerp
-
 
       const color3 = new Color3(currentColor.r, currentColor.g, currentColor.b);
       const pictureColor = Color3.Lerp(Color3.FromHexString(lightBackgroundColor), color3, pictureAlpha);

@@ -1,16 +1,13 @@
-<div class="header">
-    <div class="dragHandle" cdkDragHandle>{{matrixItem().transformationType}}</div>
-    <div class="deleteArea" (click)="deleteMatrix.next()">
-      <mat-icon class="deleteIcon">delete</mat-icon>
-    </div>
-  </div>
+@let mat = matrixContent();
+@let dims = affectedDimensions();
 
+<div class="header">
+    <div class="dragHandle" cdkDragHandle>{{transformationType()}}</div>
+    <mat-icon class="deleteIcon" (click)="deleteMatrix.emit()">delete</mat-icon>
+</div>
 <div class="outer">
-    <div class="inner" *ngrxLet="{
-        dimensions: affectedDimensions$,
-        m: matrix,
-        } as shared">
-        @switch (matrixItem().transformationType) {
+    <div class="inner">
+        @switch (transformationType()) {
             @case ('Translation') {
                 <span>1</span>
                 <span>0</span>
@@ -18,17 +15,17 @@
                 <span>0</span>
                 <span>1</span>
                 <span>0</span>
-                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getTranslation().x | number: '1.2-2' }}</span>
-                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getTranslation().y | number: '1.2-2' }}</span>
+                <span class="highlight" [class.selected]="dims.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ mat.getTranslation().x | number: '1.2-2' }}</span>
+                <span class="highlight" [class.selected]="dims.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ mat.getTranslation().y | number: '1.2-2' }}</span>
                 <span>1</span>
             }
             @case ('Scaling') {
-                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>
+                <span class="highlight" [class.selected]="dims.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ mat.getRow(0).x | number: '1.2-2' }}</span>
                 <span>0</span>
                 <span>0</span>
 
                 <span>0</span>
-                <span class="highlight"[class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>
+                <span class="highlight"[class.selected]="dims.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ mat.getRow(1).y | number: '1.2-2' }}</span>
                 <span>0</span>
                 
                 <span>0</span>
@@ -36,12 +33,12 @@
                 <span>1</span>
             }
             @case ('Rotation') {
-                <span class="highlight">{{ shared.m.getRow(0).x | number: '1.2-2' }}</span>
-                <span class="highlight">{{ shared.m.getRow(0).y | number: '1.2-2' }}</span>
+                <span class="highlight">{{ mat.getRow(0).x | number: '1.2-2' }}</span>
+                <span class="highlight">{{ mat.getRow(0).y | number: '1.2-2' }}</span>
                 <span>0</span> 
                 
-                <span class="highlight">{{ shared.m.getRow(1).x | number: '1.2-2' }}</span>
-                <span class="highlight">{{ shared.m.getRow(1).y | number: '1.2-2' }}</span>
+                <span class="highlight">{{ mat.getRow(1).x | number: '1.2-2' }}</span>
+                <span class="highlight">{{ mat.getRow(1).y | number: '1.2-2' }}</span>
                 <span>0</span>
                 
                 <span>0</span>
@@ -50,10 +47,10 @@
             }
             @case ('Shearing') {
                 <span>1</span>
-                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ shared.m.getRow(0).y | number: '1.2-2'}}</span>
+                <span class="highlight" [class.selected]="dims.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ mat.getRow(0).y | number: '1.2-2'}}</span>
                 <span>0</span>
                 
-                <span class="highlight" [class.selected]="shared.dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ shared.m.getRow(1).x | number: '1.2-2'}}</span>
+                <span class="highlight" [class.selected]="dims.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ mat.getRow(1).x | number: '1.2-2'}}</span>
                 <span>1</span>
                 <span>0</span>
                 
@@ -66,7 +63,7 @@
 
 </div>
 
-@if (matrixItem().transformationType === 'Rotation') {
+@if (transformationType() === 'Rotation') {
     <mat-slider discrete [displayWith]="formatRotationLabel" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">
         <input matSliderThumb [formControl]="slider">
     </mat-slider>

@@ -35,7 +35,6 @@
     "@babylonjs/core": "^7.32.0",
     "@chromatic-com/storybook": "^2.0.2",
     "@compodoc/compodoc": "^1.1.25",
-    "@ngrx/component": "^18.0.2",
     "@storybook/addon-docs": "^8.4.2",
     "@storybook/addon-essentials": "^8.4.2",
     "@storybook/addon-interactions": "^8.4.2",
