@@ -10,12 +10,12 @@ export enum TransformationType {
 }
 
 @Component({
-  selector: 'app-add-transformations',
-  standalone: true,
-  imports: [ CommonModule, MatButtonModule ],
-  templateUrl: './add-transformations.component.html',
-  styleUrls: ['./add-transformations.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-add-transformations',
+    imports: [CommonModule, MatButtonModule],
+    templateUrl: './add-transformations.component.html',
+    styleUrls: ['./add-transformations.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class AddTransformationsComponent {
   @HostBinding('style.backgroundColor') backgroundColor = 'lightblue';

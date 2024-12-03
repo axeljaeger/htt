@@ -27,20 +27,20 @@ enum Dimension {
 }
 
 @Component({
-  selector: 'app-matrix',
-  standalone: true,
-  hostDirectives: [CdkDrag],
-  imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],
-  templateUrl: './matrix.component.html',
-  styleUrls: ['./matrix.component.css'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      multi:true,
-      useExisting: MatrixComponent
-    }
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-matrix',
+    hostDirectives: [CdkDrag],
+    imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],
+    templateUrl: './matrix.component.html',
+    styleUrls: ['./matrix.component.css'],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            multi: true,
+            useExisting: MatrixComponent
+        }
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class MatrixComponent implements OnInit, ControlValueAccessor {
   matrixItem = input<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
