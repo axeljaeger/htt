@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, input, OnChanges, OnInit, SimpleChanges, viewChild } from '@angular/core';
+import { afterNextRender, afterRender, Component, ElementRef, HostListener, inject, input, OnChanges, SimpleChanges, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
@@ -96,7 +96,7 @@ const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, co
     styleUrls: ['./graphics-view.component.css'],
     standalone: true
 })
-export class GraphicsViewComponent implements OnInit, OnChanges {
+export class GraphicsViewComponent {
   canvasElement = viewChild<ElementRef>('canvasRef');
 
   matrices = input<Array<Matrix>>([]);
@@ -109,13 +109,47 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private engine: WebGPUEngine;
   private scene: Scene;
 
-  private transformationMesh: Mesh;
+  private transformationMesh: Mesh = null;
   private pictureMeshes: Mesh[] = [];
 
   private coordinateSystemMesh: AxesViewer;
   private coordinateSystemInstances: AxesViewer[] = [];
 
   private elRef = inject(ElementRef);
+
+  constructor() {
+    afterRender(() => {
+      this.rebuildMatrixBuffer(models[this.model]);
+    });
+
+    afterNextRender(async () => {
+      const canvas = this.canvasElement().nativeElement;
+      this.engine = new WebGPUEngine(canvas);
+      await this.engine.initAsync();
+
+
+      this.engine.getCaps().parallelShaderCompile = null
+  
+      this.createScene(); 
+      this.coordinateSystemMesh = new AxesViewer(this.scene);
+      this.coordinateSystemMesh.zAxis.dispose();
+      [
+        this.coordinateSystemMesh.xAxis,
+        this.coordinateSystemMesh.yAxis
+      ].forEach(mesh => mesh.setEnabled(false));
+  
+      this.setModel('smiley');
+        this.engine.runRenderLoop(() =>{
+          this.engine.beginFrame();
+          this.scene.render();
+          this.engine.endFrame();
+        });
+      
+      window.setTimeout(() => {
+        this.resize();
+      }, 0);        
+    });
+  }
 
   @HostListener('window:resize')
   resize(): void {
@@ -125,19 +159,17 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const aspectRatio = rect.width / rect.height;
 
-    this.engine.resize(true);
+    if (this.engine) {
+      this.engine.resize(true);
 
-    this.camera.orthoTop = 5;
-    this.camera.orthoBottom = -5;
-    this.camera.orthoLeft = -5 * aspectRatio;
-    this.camera.orthoRight = 5 * aspectRatio;
+      this.camera.orthoTop = 5;
+      this.camera.orthoBottom = -5;
+      this.camera.orthoLeft = -5 * aspectRatio;
+      this.camera.orthoRight = 5 * aspectRatio;
+    }
   }
 
   private model : Model = 'smiley';
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.rebuildMatrixBuffer(models[this.model]);
-  }
 
   rebuildMatrixBuffer(points: Vector3[][]) {
     if (!this.scene) {
@@ -145,6 +177,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
     }
 
     this.transformationMesh?.dispose();
+    this.transformationMesh = null;
     this.pictureMeshes.forEach(mesh => mesh.dispose());
     this.pictureMeshes = [];
 
@@ -165,8 +198,8 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     const matrixCount = matricesIncludingStart.length
 
-    const matrixBuffer = new Float32Array(matrixCount * MAT4_ELEMENT_COUNT);
-    const colorBuffer = new Float32Array(matrixCount * 4);
+    // const matrixBuffer = new Float32Array(matrixCount * MAT4_ELEMENT_COUNT);
+    // const colorBuffer = new Float32Array(matrixCount * 4);
 
     let previousMatrix = Matrix.Identity();
     const lastIndex = matrixCount - 1;
@@ -230,8 +263,9 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
         
         const xpoints = points.map(line => line.map(point => Vector3.TransformCoordinates(point, acc.matrixAcc)));
+       
         this.pictureMeshes.push(CreateGreasedLine(`picture-${matrixIndex}`, { points: xpoints }, { color: pictureColor }, this.scene));
-        
+
         const alpha = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
           
         const startColor = colorTable[matrixIndex+1];
@@ -249,38 +283,19 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       lineColors: [new Array<Color4>()]
     });
 
-    this.transformationMesh?.dispose();
     this.transformationMesh = CreateLineSystem("transformation-lines", {
       lines: visualData.lines,
       colors: visualData.lineColors
     }, this.scene);
 
-    this.transformationMesh.alphaIndex = 1;
+   this.transformationMesh.alphaIndex = 1;
 
-    this.engine.beginFrame();
-    this.scene.render();
-    this.engine.endFrame();
-  }
-
-  async ngOnInit() {
-    const canvas = this.canvasElement().nativeElement;
-    this.engine = new WebGPUEngine(canvas);
-    await this.engine.initAsync();
-
-    this.createScene(); 
-    this.coordinateSystemMesh = new AxesViewer(this.scene);
-    this.coordinateSystemMesh.zAxis.dispose();
-    [
-      this.coordinateSystemMesh.xAxis,
-      this.coordinateSystemMesh.yAxis
-    ].forEach(mesh => mesh.setEnabled(false));
-
-    this.setModel('smiley');
-
-    this.resize();
-    this.engine.beginFrame();
-    this.scene.render();
-    this.engine.endFrame();
+    // this.scene.onReadyObservable.addOnce(() => {
+    //   console.log("On ready: Render");
+    //   this.engine.beginFrame();
+    //   this.scene.render();
+    //   this.engine.endFrame();
+    // });
   }
 
   createScene() {

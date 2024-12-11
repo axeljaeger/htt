@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
@@ -44,11 +44,7 @@ export class MatrixComponent implements ControlValueAccessor {
   // Mostly used for storybook, actual application uses ControlValueAccessor
   // Rework so that storybook to use form wrapper
   matrixItem = input<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
-
   transformationType = signal<TransformationType>(TransformationType.Translation);
-  matrixContent = signal<Matrix>(Matrix.Identity());
-
-  debugItem = effect(() => { console.log("MatrixItem: ", this.matrixItem()) });
 
   public MatrixElement = MatrixElement;
   public Dimension = Dimension;
@@ -56,33 +52,24 @@ export class MatrixComponent implements ControlValueAccessor {
   affectedDimensions = signal<Dimension[]>([Dimension.x]);
 
   slider = new FormControl(0);
-
-  // combineLatest with affectedDimensions
-
   prevMatrix = Matrix.Identity();
   deleteMatrix = output<void>();
-  
   sliderVal = toSignal(this.slider.valueChanges);
 
-  // FIXME: Use linkedSignal for initial value?
-  calcMatrix = effect(() => {
-    console.log("matrixContent: ", this.matrixContent());
-
+  matrixContent = linkedSignal(() => {
       switch (this.transformationType()) {
         case 'Translation': {
           const tx = this.affectedDimensions().includes(Dimension.x) ? this.sliderVal() : this.prevMatrix.getTranslation().x;
           const ty = this.affectedDimensions().includes(Dimension.y) ? this.sliderVal() : this.prevMatrix.getTranslation().y;
           const newMatrix = Matrix.Translation(tx,ty,0);
-          this.prevMatrix = newMatrix
-          this.matrixContent.set(newMatrix);
-          break;
+          this.prevMatrix = newMatrix;
+          return newMatrix;
         };
 
         case 'Rotation': {
           const newMatrix = Matrix.RotationZ(Angle.FromDegrees(this.sliderVal()).radians());
           this.prevMatrix = newMatrix
-          this.matrixContent.set(newMatrix);
-          break;
+          return newMatrix;
         };
 
         case 'Scaling': {
@@ -90,8 +77,7 @@ export class MatrixComponent implements ControlValueAccessor {
           const sy = this.affectedDimensions().includes(Dimension.y) ? this.sliderVal() : this.prevMatrix.getRow(1).y;
           const newMatrix = Matrix.Scaling(sx,sy,0);
           this.prevMatrix = newMatrix
-          this.matrixContent.set(newMatrix);
-          break;
+          return newMatrix;
         };
 
         case 'Shearing': {
@@ -102,18 +88,17 @@ export class MatrixComponent implements ControlValueAccessor {
           newMatrix.setRowFromFloats(0, 1, sx, 0, 0);
           newMatrix.setRowFromFloats(1, sy, 1, 0, 0);
           this.prevMatrix = newMatrix
-          this.matrixContent.set(newMatrix);
-          break;
+          return newMatrix;
         };
 
         default:
-          this.matrixContent.set(Matrix.Identity())
+          return Matrix.Identity();
       }
+    });
 
+    updateKVA = effect(() => {
       const val = {transformationType: this.matrixItem().transformationType, matrix: this.matrixContent()}
       this.onChange(val);
-    }, {
-      allowSignalWrites: true, // Enable writing to signals inside effects
     });
 
   clickAffectedDimension(dimension: Dimension, event: MouseEvent) {
@@ -131,8 +116,6 @@ export class MatrixComponent implements ControlValueAccessor {
   }
 
   writeValue(obj: TransformationEntry): void {
-    console.log("write value: ", obj);
-
     this.transformationType.set(obj.transformationType);
     this.matrixContent.set(obj.matrix);
 
