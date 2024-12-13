@@ -93,8 +93,7 @@ const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, co
     selector: 'app-graphics-view',
     imports: [CommonModule],
     template: `<canvas #canvasRef></canvas>`,
-    styleUrls: ['./graphics-view.component.css'],
-    standalone: true
+    styleUrls: ['./graphics-view.component.css']
 })
 export class GraphicsViewComponent implements OnInit, OnChanges {
   canvasElement = viewChild<ElementRef>('canvasRef');
@@ -213,14 +212,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
         pictureSelected ? 0.1 : 
         0.2;
 
-      console.log('hoveredPicture', this.hoveredPicture);
-      console.log('matrixIndex', matrixIndex);
-      console.log('pictureSelected', pictureSelected);
-      console.log('pictureAlpha', pictureAlpha);
-
       // Use Color3.Lerp
-
-
       const color3 = new Color3(currentColor.r, currentColor.g, currentColor.b);
       const pictureColor = Color3.Lerp(Color3.FromHexString(lightBackgroundColor), color3, pictureAlpha);
       // pictureColor.toArray(acc.colorBuffer, matrixIndex * 4);
@@ -263,9 +255,18 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
 
     this.transformationMesh.alphaIndex = 1;
 
-    this.engine.beginFrame();
-    this.scene.render();
-    this.engine.endFrame();
+
+    if (!this.scene.isReady()) {
+    this.scene.onReadyObservable.addOnce(() => {
+      this.engine.beginFrame();
+      this.scene.render();
+      this.engine.endFrame();
+    });
+    } else {
+      this.engine.beginFrame();
+      this.scene.render();
+      this.engine.endFrame();
+    }
   }
 
   async ngOnInit() {

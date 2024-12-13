@@ -38,9 +38,8 @@ export interface TransformationEntry {
         AddTransformationsComponent,
         GraphicsViewComponent,
         MatrixComponent,
-        ReactiveFormsModule
-    ],
-    standalone: true
+        ReactiveFormsModule,
+    ]
 })
 export class AppComponent implements OnInit {
   ngOnInit(): void {

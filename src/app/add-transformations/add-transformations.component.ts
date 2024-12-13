@@ -14,8 +14,7 @@ export enum TransformationType {
     imports: [CommonModule, MatButtonModule],
     templateUrl: './add-transformations.component.html',
     styleUrls: ['./add-transformations.component.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransformationsComponent {
   @HostBinding('style.backgroundColor') backgroundColor = 'lightblue';
