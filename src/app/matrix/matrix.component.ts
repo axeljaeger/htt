@@ -6,9 +6,8 @@ import { MatSliderModule } from '@angular/material/slider';
 import { TransformationEntry } from '../app.component';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { Angle } from '@babylonjs/core/Maths/math.path';
-import { LetDirective } from '@ngrx/component';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { TransformationType } from '../add-transformations/add-transformations.component';
@@ -29,7 +28,7 @@ enum Dimension {
 @Component({
     selector: 'app-matrix',
     hostDirectives: [CdkDrag],
-    imports: [CommonModule, MatSliderModule, ReactiveFormsModule, LetDirective, MatIconModule, CdkDragHandle],
+    imports: [CommonModule, MatSliderModule, ReactiveFormsModule, MatIconModule, CdkDragHandle],
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.css'],
     providers: [
@@ -39,15 +38,15 @@ enum Dimension {
             useExisting: MatrixComponent
         }
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatrixComponent implements OnInit, ControlValueAccessor {
-  matrixItem = input<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
-
+  // Only used for storybook, application uses CVAs
+  matrixItem = new BehaviorSubject<TransformationEntry>({ transformationType: TransformationType.Translation, matrix: Matrix.Identity()});
   public MatrixElement = MatrixElement;
   public Dimension = Dimension;
-
+  public TransformationType = TransformationType;
+  
   affectedDimensions$ = new BehaviorSubject<Dimension[]>([Dimension.x]);
 
   slider = new FormControl(0);
@@ -63,7 +62,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
     ]
   ).pipe(
     map(([slider, dimensions]) => {
-      switch (this.matrixItem().transformationType) {
+      switch (this.matrixItem.value.transformationType) {
         case 'Translation': {
           const tx = dimensions.includes(Dimension.x) ? slider : this.prevMatrix.getTranslation().x;
           const ty = dimensions.includes(Dimension.y) ? slider : this.prevMatrix.getTranslation().y;
@@ -118,6 +117,8 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(obj: TransformationEntry): void {
+    console.log("writeValue", obj);
+    this.matrixItem.next(obj);
     switch (obj.transformationType) {
       case 'Rotation': {
         const rotationMatrix = obj.matrix.getRotationMatrix();
@@ -154,7 +155,7 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit(): void {    
     this.matrix.subscribe(matrix => {
-      const val = {transformationType: this.matrixItem().transformationType, matrix}
+      const val = {transformationType: this.matrixItem.value.transformationType, matrix}
       this.onChange(val);
     });
   }
