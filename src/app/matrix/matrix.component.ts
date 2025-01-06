@@ -117,7 +117,6 @@ export class MatrixComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(obj: TransformationEntry): void {
-    console.log("writeValue", obj);
     this.matrixItem.next(obj);
     switch (obj.transformationType) {
       case 'Rotation': {
