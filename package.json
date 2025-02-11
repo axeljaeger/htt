@@ -32,7 +32,7 @@
     "@angular-devkit/build-angular": "^19.0.6",
     "@angular/cli": "~19.0.6",
     "@angular/compiler-cli": "^19.0.5",
-    "@babylonjs/core": "^7.42.0",
+    "@babylonjs/core": "^7.48.3",
     "@chromatic-com/storybook": "^3.2.3",
     "@compodoc/compodoc": "^1.1.25",
     "@storybook/addon-docs": "^8.4.7",
