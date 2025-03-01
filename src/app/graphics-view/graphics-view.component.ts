@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, input, OnChanges, OnInit, SimpleChanges, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, input, OnChanges, OnInit, SimpleChanges, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Scene } from '@babylonjs/core/scene';
@@ -22,6 +22,7 @@ import { AxesViewer } from '@babylonjs/core/Debug/axesViewer';
 import { Engine } from '@babylonjs/core/Engines/engine';
 import { CreateGreasedLine } from '@babylonjs/core/Meshes/Builders/greasedLineBuilder';
 import { createPalette } from 'hue-map';
+import { LinesMesh } from '@babylonjs/core';
 
 const MAT4_ELEMENT_COUNT = 16;
 
@@ -95,7 +96,11 @@ const color4WithAlpha = (color: Color3, alpha: number) => new Color4(color.r, co
     template: `<canvas #canvasRef></canvas>`,
     styleUrls: ['./graphics-view.component.css']
 })
-export class GraphicsViewComponent implements OnInit, OnChanges {
+export class GraphicsViewComponent implements OnInit, AfterViewInit, OnChanges {
+  ngAfterViewInit(): void {
+    this.resize();
+  }
+
   canvasElement = viewChild<ElementRef>('canvasRef');
 
   matrices = input<Array<Matrix>>([]);
@@ -108,7 +113,7 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   private engine: WebGPUEngine;
   private scene: Scene;
 
-  private transformationMesh: Mesh;
+  private transformationMesh: LinesMesh = undefined;
   private pictureMeshes: Mesh[] = [];
 
   private coordinateSystemMesh: AxesViewer;
@@ -119,6 +124,8 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
   @HostListener('window:resize')
   resize(): void {
     const rect = this.elRef.nativeElement.getBoundingClientRect();
+    console.log("Resize to: ", rect);
+
     this.canvasElement().nativeElement.width = rect.width;
     this.canvasElement().nativeElement.height = rect.height;
 
@@ -247,32 +254,41 @@ export class GraphicsViewComponent implements OnInit, OnChanges {
       lineColors: [new Array<Color4>()]
     });
 
-    this.transformationMesh?.dispose();
     this.transformationMesh = CreateLineSystem("transformation-lines", {
       lines: visualData.lines,
-      colors: visualData.lineColors
+      colors: visualData.lineColors,
+      instance: this.transformationMesh,
+      updatable: true
     }, this.scene);
 
     this.transformationMesh.alphaIndex = 1;
 
+    console.log("Re-created buffer");
 
-    if (!this.scene.isReady()) {
-    this.scene.onReadyObservable.addOnce(() => {
-      this.engine.beginFrame();
-      this.scene.render();
-      this.engine.endFrame();
-    });
-    } else {
-      this.engine.beginFrame();
-      this.scene.render();
-      this.engine.endFrame();
-    }
+    // if (!this.scene.isReady()) {
+    // this.scene.onReadyObservable.addOnce(() => {
+    //   this.engine.beginFrame();
+    //   this.scene.render();
+    //   this.engine.endFrame();
+    // });
+    // } else {
+    //   this.engine.beginFrame();
+    //   this.scene.render();
+    //   this.engine.endFrame();
+    // }
   }
 
   async ngOnInit() {
     const canvas = this.canvasElement().nativeElement;
     this.engine = new WebGPUEngine(canvas);
     await this.engine.initAsync();
+    this.engine.runRenderLoop(() => {
+      this.engine.beginFrame();
+      this.scene.render();
+      this.engine.endFrame();
+    });
+
+
 
     this.createScene(); 
     this.coordinateSystemMesh = new AxesViewer(this.scene);

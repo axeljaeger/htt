@@ -13,12 +13,12 @@ import {
   AddTransformationsComponent,
   TransformationType,
 } from './add-transformations/add-transformations.component';
-import { GraphicsViewComponent } from './graphics-view/graphics-view.component';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { createPalette } from 'hue-map';
+import { SvgGraphicsViewComponent } from './svg-graphics-view/svg-graphics-view.component';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
@@ -34,11 +34,11 @@ export interface TransformationEntry {
         MatButtonModule,
         MatButtonToggleModule,
         MatIconModule,
-        AsyncPipe,
         AddTransformationsComponent,
-        GraphicsViewComponent,
+        AsyncPipe,
         MatrixComponent,
         ReactiveFormsModule,
+        SvgGraphicsViewComponent
     ]
 })
 export class AppComponent implements OnInit {

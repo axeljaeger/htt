@@ -3,6 +3,22 @@
     gap: 0px 0px;
     display: flex;
     flex-direction: column;
+    background-color: #3F4D4F;
+}
+
+app-svg-graphics-view {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+div.bottom-bar {
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    bottom: 0px;
+    margin: 1ex;
+    border-radius: 1ex;
 }
 
 .canvas {
@@ -20,6 +36,7 @@
     align-items: center;
     padding: 30px;
     gap: 10px;
+    border-radius: 1ex;
 }
 
 .cdk-drag-preview {
