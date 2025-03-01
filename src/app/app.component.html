@@ -1,13 +1,19 @@
-<app-graphics-view 
+<!-- <app-graphics-view 
   #graphicsView class="canvas" 
   [matrices]="matrices$ | async" 
   [hoveredPicture]="hoveredPicture"
   [hoveredTransformation]="hoveredTransformation" 
-  [axesVisible]="axesVisible" />
+  [axesVisible]="axesVisible" /> -->
+<app-svg-graphics-view 
+  [matrices]="matrices$ | async"
+  [colors]="colors"
+  [hoveredPicture]="hoveredPicture"
+  [hoveredTransformation]="hoveredTransformation" 
+/>
 <mat-button-toggle-group class="viewport-options" multiple vertical (change)="setAxesVisible($event)">
   <mat-button-toggle value="axes">AX</mat-button-toggle>
 </mat-button-toggle-group>
-<div [formGroup]="matrixForm">
+<div class="bottom-bar" [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     @for (alias of matrixArray.controls; track alias; let i = $index) {
@@ -23,7 +29,7 @@
       (mouseout)="hoverPicture(-1)" />
       @if ($last) {
       <div class="math" after style="display: flex; flex-direction: row;">x
-        <mat-button-toggle-group vertical (change)="graphicsView.setModel($event.value)">
+        <mat-button-toggle-group vertical>
           <mat-button-toggle value="smiley"><mat-icon>
             sentiment_satisfied
           </mat-icon></mat-button-toggle>

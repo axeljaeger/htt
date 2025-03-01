@@ -1,0 +1,54 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow>
+      <mo>(</mo>
+      <mtable>
+        <mtr>
+          <mtd><mn>1</mn></mtd>
+          <mtd><mn>2</mn></mtd>
+          <mtd><mn>3</mn></mtd>
+        </mtr>
+        <mtr>
+          <mtd><mn>4</mn></mtd>
+          <mtd><mn>5</mn></mtd>
+          <mtd><mn>6</mn></mtd>
+        </mtr>
+        <mtr>
+          <mtd><mn>7</mn></mtd>
+          <mtd><mn>8</mn></mtd>
+          <mtd><mn>9</mn></mtd>
+        </mtr>
+      </mtable>
+      <mo>)</mo>
+    </mrow>
+  </math>
+
+<svg viewBox="-5 -5 10 15">
+    <defs>
+        <g id="shape">
+            <circle cx="0" cy="0" r="1" class="circle"/>
+            <circle cx="0.4" cy="-0.3" r="0.25" class="circle"/>
+            <circle cx="-0.4" cy="-0.3" r="0.25" class="circle"/>
+            <path d="M 0.3536 0.3536 A 0.5 0.5 0 0 1 -0.3536 0.3536" class="circle"/>
+        </g>
+      </defs>
+      <use xlink:href="#shape" [style.stroke]="vm().pictureColors[0]"/>
+
+      @for (lineGroup of vm().lines; track $index; let groupIndex = $index) {
+        @for (line of lineGroup; track $index) {    
+        <line class="line"
+        [style.stroke]="vm().lineColors[groupIndex]"
+        [attr.x1]="line[0].x" 
+        [attr.y1]="line[0].y"
+        [attr.x2]="line[1].x"
+        [attr.y2]="line[1].y" /> 
+        }
+    }
+
+      @for (matrix of vm().pictureMatrices; track $index) {
+        <use xlink:href="#shape" [attr.transform]="matrix" [style.stroke]="vm().pictureColors[$index]"/>
+      }
+
+
+</svg>
+
+
