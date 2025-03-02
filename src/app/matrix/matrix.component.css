@@ -4,42 +4,10 @@
   align-items: center;
 }
 
-.outer {
-    border-radius: 5% / 50%;
-    background-color: black
-}
-
 .outer:hover {
   mat-slider { 
     visibility: visible; 
   }
-}
-
-.inner {
-  content: '';
-  background: inherit;
-  border-radius: 3% / 50%;
-  background-color: white;
-  margin-left: 0.5ex;
-  margin-right: 0.5ex;
-  padding: 1.5ex 1ex;
-
-  font-size: 1.3em;
-  font-family: "Times New Roman";
-
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-items: center;
-}
-
-.content {
-  visibility: hidden;
-  background-color: h;
 }
 
 .header {
@@ -47,7 +15,6 @@
   flex-direction: row; 
   align-items: stretch;
   position: relative; 
-  margin-bottom: -1.2ex; 
   background-color: rgb(240, 240, 240);
   border-radius: 15px;
   opacity: 0;
@@ -88,22 +55,29 @@
 
 mat-slider { 
   width: 80%; 
-  margin-top: -2.75ex;
+  margin-top: -2ex;
   opacity: 0;
 }
 
-span {
-  min-width: 6ex;
-  text-align: center;
-  padding: .25ex .25ex;
+math {
+  font-size: 20px;
 }
 
-span.highlight {
+mtable {
+  border-spacing: 0px 10px; /* Makes outer parenthesis uggly */
+}
+
+mtd {
+  min-width: 6ex;
+  padding: 1ex 0ex;
+}
+
+.highlight {
   border-radius: 1ex;
   font-weight: bold;
 }
 
-span.selected {
+.selected {
   background-color: rgb(216, 132, 209);
   border-radius: 1ex;
   font-weight: bold;

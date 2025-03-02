@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { MatrixComponent } from './matrix.component';
-import { Matrix } from '@babylonjs/core/Maths/math';
+import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { TransformationType } from '../add-transformations/add-transformations.component';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories

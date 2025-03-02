@@ -5,63 +5,85 @@
     <mat-icon class="deleteIcon">delete</mat-icon>
 </div>
 
-<div class="outer">
-    <div class="inner">
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+    <mrow>
+      <mo>(</mo>
+      <mtable>
         @switch (matrixItem.value.transformationType) {
             @case ('Translation') {
-                <span>1</span>
-                <span>0</span>
-                <span>0</span>
-                <span>0</span>
-                <span>1</span>
-                <span>0</span>
-                <span class="highlight" [class.selected]="dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ m.getTranslation().x | number: '1.2-2' }}</span>
-                <span class="highlight" [class.selected]="dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ m.getTranslation().y | number: '1.2-2' }}</span>
-                <span>1</span>
+                <mtr>
+                    <mtd><mn>1</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd class="highlight" [class.selected]="dimensions.includes(Dimension.x)"><mn (click)="clickAffectedDimension(Dimension.x, $event)">{{ m.getTranslation().x | number: '1.2-2' }}</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                    <mtd class="highlight" [class.selected]="dimensions.includes(Dimension.y)"><mn (click)="clickAffectedDimension(Dimension.y, $event)">{{ m.getTranslation().y | number: '1.2-2' }}</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                  </mtr>
             }
             @case ('Scaling') {
-                <span class="highlight" [class.selected]="dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ m.getRow(0).x | number: '1.2-2' }}</span>
-                <span>0</span>
-                <span>0</span>
-
-                <span>0</span>
-                <span class="highlight"[class.selected]="dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ m.getRow(1).y | number: '1.2-2' }}</span>
-                <span>0</span>
-                
-                <span>0</span>
-                <span>0</span>
-                <span>1</span>
+                <mtr>
+                    <mtd class="highlight" [class.selected]="dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd class="highlight"[class.selected]="dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)"><mn>{{ m.getRow(1).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                  </mtr>
             }
             @case ('Rotation') {
-                <span class="highlight">{{ m.getRow(0).x | number: '1.2-2' }}</span>
-                <span class="highlight">{{ m.getRow(0).y | number: '1.2-2' }}</span>
-                <span>0</span> 
-                
-                <span class="highlight">{{ m.getRow(1).x | number: '1.2-2' }}</span>
-                <span class="highlight">{{ m.getRow(1).y | number: '1.2-2' }}</span>
-                <span>0</span>
-                
-                <span>0</span>
-                <span>0</span>
-                <span>1</span>
+                <mtr>
+                    <mtd class="highlight"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"><mn>{{ m.getRow(0).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd class="highlight">{{ m.getRow(1).x | number: '1.2-2' }}<mn></mn></mtd>
+                    <mtd class="highlight">{{ m.getRow(1).y | number: '1.2-2' }}<mn></mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                  </mtr>            
             }
             @case ('Shearing') {
-                <span>1</span>
-                <span class="highlight" [class.selected]="dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)">{{ m.getRow(0).y | number: '1.2-2'}}</span>
-                <span>0</span>
-                
-                <span class="highlight" [class.selected]="dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)">{{ m.getRow(1).x | number: '1.2-2'}}</span>
-                <span>1</span>
-                <span>0</span>
-                
-                <span>0</span>
-                <span>1</span>
-                <span>0</span>
+                <mtr>
+                    <mtd><mn>1</mn></mtd>
+                    <mtd class="highlight" [class.selected]="dimensions.includes(Dimension.x)" (click)="clickAffectedDimension(Dimension.x, $event)"><mn>{{ m.getRow(0).y | number: '1.2-2'}}</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd class="highlight" [class.selected]="dimensions.includes(Dimension.y)" (click)="clickAffectedDimension(Dimension.y, $event)"><mn>{{ m.getRow(1).x | number: '1.2-2'}}</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>0</mn></mtd>
+                    <mtd><mn>1</mn></mtd>
+                  </mtr>
             }
         }
-        </div>    
+    </mtable>
+    <mo>)</mo>
+  </mrow>
+</math>
 
-</div>
 
 @if (matrixItem.value.transformationType === TransformationType.Rotation) {
     <mat-slider discrete [displayWith]="formatRotationLabel" min="-360.0" max="360.0" step="1" value="0" style="width: 100%">

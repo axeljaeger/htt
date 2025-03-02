@@ -1,8 +1,0 @@
-:host {
-    overflow: hidden;
-}
-
-canvas {
-    position: absolute;
-    outline:none;
-}
