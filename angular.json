@@ -15,9 +15,6 @@
           "options": {
             "outputPath": "dist/htt",
             "index": "src/index.html",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -76,10 +73,6 @@
         "test": {
           "builder": "@angular-devkit/build-angular:web-test-runner",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               "src/favicon.ico",
