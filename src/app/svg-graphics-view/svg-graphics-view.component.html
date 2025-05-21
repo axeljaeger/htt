@@ -1,28 +1,24 @@
 <svg viewBox="-5 -5 10 15">
     <defs>
-        <g id="shape">
+        <g id="smiley">
             <circle cx="0" cy="0" r="1" class="circle"/>
             <circle cx="0.4" cy="-0.3" r="0.25" class="circle"/>
             <circle cx="-0.4" cy="-0.3" r="0.25" class="circle"/>
             <path d="M 0.3536 0.3536 A 0.5 0.5 0 0 1 -0.3536 0.3536" class="circle"/>
         </g>
+        <g id="home">
+<path d="M 0 0 H 1 V -1 H 0 Z M 0 0 L 1 -1 M 1 0 L 0 -1 M 0 -1 L 0.5 -1.5 L 1 -1" class="circle"/>        </g>
       </defs>
-      <use xlink:href="#shape" [style.stroke]="vm().pictureColors[0]"/>
 
-      @for (lineGroup of vm().lines; track $index; let groupIndex = $index) {
-        @for (line of lineGroup; track $index) {    
-        <line class="line"
-        [style.stroke]="vm().lineColors[groupIndex]"
-        [attr.x1]="line[0].x" 
-        [attr.y1]="line[0].y"
-        [attr.x2]="line[1].x"
-        [attr.y2]="line[1].y" /> 
-        }
-    }
+      <use [attr.xlink:href]="`#${model()}`" [style.stroke]="vm().pictures[0].color"/>
 
-      @for (matrix of vm().pictureMatrices; track $index) {
-        <use xlink:href="#shape" [attr.transform]="matrix" [style.stroke]="vm().pictureColors[$index]"/>
+      @for (line of vm().lines; track $index; let groupIndex = $index) {
+        <path class="line" 
+        [style.stroke]="line.color"
+        [attr.d]="line.path" /> 
+      }
+
+      @for (picture of vm().pictures; track $index) {
+        <use [attr.xlink:href]="`#${model()}`" [attr.transform]="picture.matrix" [style.stroke]="picture.color"/>
       }
 </svg>
-
-

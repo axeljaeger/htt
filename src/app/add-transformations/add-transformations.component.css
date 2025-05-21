@@ -9,32 +9,10 @@
     opacity 0.4s;
 }
 
-button {
-  border: none;
-  padding: 1em;
-  opacity: 0;
-  cursor: pointer;
-  transition: all 0.4s;
-}
-
-div.button-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0 -3ex;
-  z-index: 10;
-  gap: 1ex; 
-}
-
-:host:hover, host-hover-mock {
+:host:hover {
   opacity: 1;
-
   button {
     opacity: 1;
-  }
-
-  button:hover {
-    visibility: visible;
   }
 }
 

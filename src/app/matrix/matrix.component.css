@@ -5,7 +5,7 @@
 }
 
 .outer:hover {
-  mat-slider { 
+  input[type="range"] { 
     visibility: visible; 
   }
 }
@@ -29,13 +29,13 @@
 .deleteIcon {
   font-size: 1.0em;
   height: 1.2em;
-  width: 1.1em;
+  width: 1.5em;
   display:flex;
   border-radius: 0px 15px 15px 0px;
   cursor: pointer;
   transition: all 0.4s;
-  padding: 0 0.75ex 0 0.5ex;
   align-items: center;
+  justify-content: center;
 }
 
 .deleteIcon:hover {
@@ -44,18 +44,18 @@
 }
 
 :host:hover {
-  mat-slider { 
+  input[type="range"] {
     opacity: 1;
   }
-
+  
   .header {
     opacity: 1;
   }
 }
 
-mat-slider { 
-  width: 80%; 
-  margin-top: -2ex;
+input[type="range"] { 
+  width: 70%; 
+  margin-top: -1ex;
   opacity: 0;
 }
 
