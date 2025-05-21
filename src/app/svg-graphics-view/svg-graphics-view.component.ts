@@ -3,13 +3,6 @@ import { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector';
 
 export type Model = 'home' | 'smiley';
 
-// const points = [
-//   new Vector3(0, 0, 0),
-//   new Vector3(1, 0, 0),
-//   new Vector3(1, 1, 0),
-//   new Vector3(0, 0, 0),
-// ];
-
 const circleRes = 8;
 
 const circle = new Array(circleRes + 1).fill(0).map((val, index) => {
@@ -31,6 +24,18 @@ const smiley = [
   mouth
 ];
 
+const home = [
+  new Vector3(0,0,0),
+  new Vector3(1,0,0),
+  new Vector3(0,-1,0),
+  new Vector3(1,-1,0),
+  new Vector3(.5, -1.5, 0),
+  new Vector3(0,-1,0),
+  new Vector3(0,0,0),
+  new Vector3(1,-1,0),
+  new Vector3(1,0,0),
+]
+
 const setAlpha = (hex : string, alpha : number) => 
   /^#?[0-9A-Fa-f]{8}$/.test(hex) 
       ? `#${hex.replace("#", "").slice(0, 6)}${Math.round(alpha * 255).toString(16).padStart(2, "0")}`
@@ -47,6 +52,7 @@ export class SvgGraphicsViewComponent {
   colors = input<string[]>();
   hoveredPicture = input(-1);  
   hoveredTransformation = input(-1);
+  model = input<Model>('home');
 
   vm = computed(() => [...this.matrices(), Matrix.Identity()].reduceRight((acc, matrix, matrixIndex) => {
         const previousMatrix = acc.matrixAcc;
@@ -56,12 +62,12 @@ export class SvgGraphicsViewComponent {
         const pictureSelected = this.hoveredPicture() !== -1;
         const transformationSelected = this.hoveredTransformation() !== -1;
         const lastIndex = this.matrices().length;
-        const points = smiley;
+        const points = this.model() === 'smiley' ? smiley : home;
 
         // Pictures
         const m = acc.matrixAcc.asArray();
-        acc.pictureMatrices.push(`matrix(${m[0]}, ${m[1]}, ${m[4]}, ${m[5]}, ${m[12]}, ${m[13]})`);
-
+        const matrixString = `matrix(${m[0]}, ${m[1]}, ${m[4]}, ${m[5]}, ${m[12]}, ${m[13]})`;
+    
         const pictureAlpha = 
           this.hoveredPicture() === matrixIndex ? 0.8 : 
           pictureSelected ? 0.1 : 
@@ -69,35 +75,30 @@ export class SvgGraphicsViewComponent {
   
         // Somehow include pictureAlpha in the color
         const pictureColor = this.colors()[matrixIndex];
-        acc.pictureColors.push(setAlpha(pictureColor, pictureAlpha));
+        const color = setAlpha(pictureColor, pictureAlpha);
+        acc.pictures.push({ matrix: matrixString, color });
 
         // Lines
         if (matrixIndex !== lastIndex) {
-          acc.lines.push(points.flat().map(point => [
-            Vector3.TransformCoordinates(point, previousMatrix),
-            Vector3.TransformCoordinates(point, acc.matrixAcc),
-          ]))
+          const path = points.flat().reduce((accx, point) => {
+            const p1 = Vector3.TransformCoordinates(point, previousMatrix);
+            const p2 = Vector3.TransformCoordinates(point, acc.matrixAcc);
+            return accx + `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} `;
+          }, '');
         
           const selected = this.hoveredTransformation() === matrixIndex;
           
-          const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;            
+          const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
           const startColor = this.colors()[matrixIndex+1];
           const endColor = this.colors()[matrixIndex];
         
-          // Include alpha here
-          acc.lineColors.push(setAlpha(endColor, intensity));
+          const color = setAlpha(endColor, intensity);
+          acc.lines.push({path, color});
         } 
         return acc
       }, {
         matrixAcc: Matrix.Identity(),
-        
-        // Pictures
-        pictureMatrices: [] as string[],
-        pictureColors: [] as string[],
-
-        // Transformations between pictures
-        lines: [] as [Vector3, Vector3][][],
-        lineColors: [] as string[]
+        pictures: [] as { matrix: string, color: string} [],
+        lines: [] as { path: string, color: string}[],
       }));
 }
-

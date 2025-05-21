@@ -1,6 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+    --accent: rgb(216, 132, 209);
+    color-scheme: light dark;
+}
+
 body {
     margin:0;
 }
 html, body { height: 100%; overflow: hidden;}
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+    margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
+
+.icon {
+    font-family: 'Material Icons';
+}
+
+div.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 10;
+  gap: 1ex; 
+}
+
+div.button-container button {
+  border: none;
+  background-color: var(--accent);
+  border-radius: 1ex;
+  padding: 1em;
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.4s;
+  filter: drop-shadow(5px 5px 5px);
+}

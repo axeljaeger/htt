@@ -1,44 +1,35 @@
-<!-- <app-graphics-view 
-  #graphicsView class="canvas" 
-  [matrices]="matrices$ | async" 
-  [hoveredPicture]="hoveredPicture"
-  [hoveredTransformation]="hoveredTransformation" 
-  [axesVisible]="axesVisible" /> -->
 <app-svg-graphics-view 
-  [matrices]="matrices$ | async"
-  [colors]="colors"
+  [matrices]="matrices()"
+  [colors]="colors()"
   [hoveredPicture]="hoveredPicture"
-  [hoveredTransformation]="hoveredTransformation" 
+  [hoveredTransformation]="hoveredTransformation"
+  [model]="model()"
 />
-<mat-button-toggle-group class="viewport-options" multiple vertical (change)="setAxesVisible($event)">
-  <mat-button-toggle value="axes">AX</mat-button-toggle>
-</mat-button-toggle-group>
 <div class="bottom-bar" [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     @for (alias of matrixArray.controls; track alias; let i = $index) {
     @if ($first) {
       <div class="math" before>x' =</div>
-      <app-add-transformations [color]="colors[i]" (addTransformation)="addTransformation($event,i)" (mouseover)="hoverPicture(i)"
+      <app-add-transformations [color]="colors()[i]" (addTransformation)="addTransformation($event,i)" (mouseover)="hoverPicture(i)"
       (mouseout)="hoverPicture(-1)"></app-add-transformations>
     }
       <app-matrix [formControlName]="i"  [class.selected]="hoveredTransformation === i" (mouseover)="hoverTransformation(i)"
       (mouseout)="hoverTransformation(-1)" (deleteMatrix)="deleteTransformation(i)">
       </app-matrix>
-    <app-add-transformations [color]="colors[i+1]" (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverPicture(i+1)"
+    <app-add-transformations [color]="colors()[i+1]" (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverPicture(i+1)"
       (mouseout)="hoverPicture(-1)" />
       @if ($last) {
-      <div class="math" after style="display: flex; flex-direction: row;">x
-        <mat-button-toggle-group vertical>
-          <mat-button-toggle value="smiley"><mat-icon>
+      <div class="math source" after>x
+        <div class="button-container ">
+        <button class="icon" (click)="model.set('smiley')">
             sentiment_satisfied
-          </mat-icon></mat-button-toggle>
-          <mat-button-toggle value="home"><mat-icon>
-            home
-          </mat-icon></mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
-
+        </button>
+        <button class="icon" (click)="model.set('home')">
+          home
+        </button>
+        </div>
+        </div>
       }
     }
   </div>

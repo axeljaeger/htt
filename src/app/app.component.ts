@@ -1,22 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import {
-  DragDropModule,
-  CdkDragDrop,
+  CdkDrag, CdkDragDrop, CdkDropList
 } from '@angular/cdk/drag-drop';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 
-import { AsyncPipe } from '@angular/common';
 import {
   AddTransformationsComponent,
   TransformationType,
 } from './add-transformations/add-transformations.component';
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 import { createPalette } from 'hue-map';
 import { SvgGraphicsViewComponent } from './svg-graphics-view/svg-graphics-view.component';
 
@@ -30,60 +25,49 @@ export interface TransformationEntry {
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     imports: [
-        DragDropModule,
-        MatButtonModule,
-        MatButtonToggleModule,
-        MatIconModule,
-        AddTransformationsComponent,
-        AsyncPipe,
+        CdkDrag,
+        CdkDropList,
         MatrixComponent,
-        ReactiveFormsModule,
-        SvgGraphicsViewComponent
+        AddTransformationsComponent,
+        SvgGraphicsViewComponent,
+        ReactiveFormsModule
     ]
 })
-export class AppComponent implements OnInit {
-  ngOnInit(): void {
-    this.calculateColors();
-  }
-  axesVisible: false;
-
-  setAxesVisible($event: MatButtonToggleChange) {
-    this.axesVisible = $event.value.includes('axes');
-  }
+export class AppComponent {
   private fb = inject(FormBuilder);
   title = 'htt';
+
+  model = signal<'home' | 'smiley'>('home');
 
   hoveredPicture = -1;
   hoveredTransformation = -1;
 
-  public colors = [] as string[];
-
   matrixArray = this.fb.array([
     this.fb.control({
-      transformationType: TransformationType.Translation,
+      transformationType: 'Translation',
       matrix: Matrix.Translation(5, 0, 0),
     } as TransformationEntry)
   ])
+
+  matrixArrayValues = toSignal(this.matrixArray.valueChanges, {
+    initialValue: this.matrixArray.getRawValue(),
+  });
+
+  public colors = computed(() => createPalette({
+      map: 'viridis',
+      steps: this.matrixArrayValues().length + 1,
+    }).format('cssHex')
+  );
 
   matrixForm = this.fb.group({
     matrixArray: this.matrixArray
   });
 
-  matrices$ = this.matrixArray.valueChanges.pipe(startWith(this.matrixArray.value), map(entries => entries.map(entry => entry.matrix)));
+  matrices = computed(() => this.matrixArrayValues().map(entry => entry.matrix));
 
   addTransformation(transformationType: TransformationType, index: number) {
     this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
     this.hoverTransformation(index);
-
-    this.calculateColors();
-  }
-  calculateColors() {
-    const matrixCount = this.matrixArray.length + 1;
-
-    this.colors = createPalette({
-      map: 'viridis',
-      steps: matrixCount,
-    }).format('cssHex');
   }
 
   drop(event: CdkDragDrop<TransformationEntry[]>) {
@@ -97,23 +81,16 @@ export class AppComponent implements OnInit {
 
   deleteTransformation(index: number): void {
     this.matrixArray.removeAt(index);
-    this.calculateColors();
   }
 
   initialValue(transformationType: TransformationType): TransformationEntry {
-    const matrix = ((transformation) => {
-      switch (transformation) {
-        case TransformationType.Rotation:
-          return Matrix.RotationZ(Math.PI / 2.0);
-        case TransformationType.Translation:
-          return Matrix.Translation(1, 0, 0);
-        case TransformationType.Scaling:
-          return Matrix.Scaling(1, 1, 1);
-        case TransformationType.Shearing:
-          return Matrix.Scaling(2, 2, 2);
-      }
-    })(transformationType);
-
+    const matrix = {
+        ['Rotation']: Matrix.RotationZ(Math.PI / 2.0),
+        ['Translation']: Matrix.Translation(1, 0, 0),
+        ['Scaling']: Matrix.Scaling(1, 1, 1),
+        ['Shearing']: Matrix.Scaling(2, 2, 2),
+    }[transformationType];
+    
     return {
       transformationType,
       matrix,
