@@ -15,10 +15,7 @@ type Story = StoryObj<MatrixComponent>;
 export const Primary: Story = {
   args: {
     //primary: true,
-    matrixItem: {
-            transformationType: TransformationType.Translation,
-            matrix: Matrix.Identity()
-    },
+
   },
   parameters: {
     layout: 'centered',
