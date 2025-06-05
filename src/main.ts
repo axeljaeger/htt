@@ -1,10 +1,10 @@
 import { AppComponent } from './app/app.component';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 bootstrapApplication(AppComponent, {
     providers: [
-        provideExperimentalZonelessChangeDetection(),
+        provideZonelessChangeDetection(),
     ]
 })
   .catch(err => console.error(err));
