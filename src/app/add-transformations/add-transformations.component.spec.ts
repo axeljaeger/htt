@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { AddTransformationsComponent } from './add-transformations.component';
+
+import { describe, beforeEach, it, expect } from 'vitest';
 
 describe('AddTransformationsComponent', () => {
   let component: AddTransformationsComponent;
@@ -8,7 +11,8 @@ describe('AddTransformationsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ AddTransformationsComponent ]
+      imports: [ AddTransformationsComponent ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 
