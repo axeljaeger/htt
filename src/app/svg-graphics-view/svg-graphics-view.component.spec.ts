@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 import { SvgGraphicsViewComponent } from './svg-graphics-view.component';
+
+import { describe, beforeEach, it, expect } from 'vitest';
 
 describe('SvgGraphicsViewComponent', () => {
   let component: SvgGraphicsViewComponent;
@@ -8,7 +12,8 @@ describe('SvgGraphicsViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SvgGraphicsViewComponent]
+      imports: [SvgGraphicsViewComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 
