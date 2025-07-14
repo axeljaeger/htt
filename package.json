@@ -30,7 +30,7 @@
     "@angular/cli": "20.1.0",
     "@angular/compiler-cli": "20.1.0",
     "@angular/platform-browser-dynamic": "^20.1.0",
-    "@babylonjs/core": "8.16.0",
+    "@babylonjs/core": "8.16.1",
     "@chromatic-com/storybook": "4.0.1",
     "@storybook/addon-docs": "9.0.16",
     "@storybook/addon-links": "9.0.16",
