@@ -89,8 +89,8 @@ export class SvgGraphicsViewComponent {
           const selected = this.hoveredTransformation() === matrixIndex;
           
           const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
-          const startColor = this.pictureColors()[matrixIndex+1];
-          const endColor = this.pictureColors()[matrixIndex];
+          
+          
         
           const color = setAlpha(this.transformationColors()[matrixIndex], intensity);
           acc.lines.push({path, color});
