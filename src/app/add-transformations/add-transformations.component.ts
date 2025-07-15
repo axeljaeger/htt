@@ -9,8 +9,10 @@ export type TransformationType = 'Rotation' | 'Scaling' | 'Shearing' | 'Translat
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTransformationsComponent {
-  @HostBinding('style.backgroundColor') backgroundColor = 'lightblue';
+  @HostBinding('style.--accent') backgroundColor = 'lightblue';
   color = input<string>();
-  public addTransformation = output<TransformationType>();
   updateCss = effect(() => this.backgroundColor = this.color());
+
+  public addTransformation = output<TransformationType>();
+
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, model, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, HostBinding, input, model, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -30,6 +30,10 @@ export class MatrixComponent implements ControlValueAccessor {
   // Only used for storybook, application uses CVAs
   matrixItem = signal<TransformationEntry>({ transformationType: 'Translation', matrix: Matrix.Identity()});
   affectedDimensions = signal<Dimension[]>(['x']);
+
+  @HostBinding('style.--accent') backgroundColor = 'lightblue';
+  color = input<string>();
+  updateCss = effect(() => this.backgroundColor = this.color());
 
   slider = model(0);
   matrix = output<Matrix>();

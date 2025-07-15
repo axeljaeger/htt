@@ -1,12 +1,10 @@
 :root {
-    --accent: rgb(216, 132, 209);
+
     color-scheme: light dark;
 }
 
-body {
-    margin:0;
-}
 html, body { height: 100%; overflow: hidden;}
+
 body { 
     margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; 
 }
@@ -25,11 +23,11 @@ div.button-container {
 
 div.button-container button {
   border: none;
-  background-color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 60%, light-dark(white, black) 40%);
   border-radius: 1ex;
   padding: 1em;
   opacity: 0;
   cursor: pointer;
   transition: all 0.4s;
-  filter: drop-shadow(5px 5px 5px);
+  filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.5));
 }

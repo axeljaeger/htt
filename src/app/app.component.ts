@@ -53,10 +53,16 @@ export class AppComponent {
     initialValue: this.matrixArray.getRawValue(),
   });
 
-  public colors = computed(() => createPalette({
+  public pictureColors = computed(() => createPalette({
       map: 'viridis',
       steps: this.matrixArrayValues().length + 1,
     }).format('cssHex')
+  );
+
+  public transformationColors = computed(() => createPalette({
+      map: 'viridis',
+      steps: this.matrixArrayValues().length + 2,
+    }).format('cssHex').slice(1)
   );
 
   matrixForm = this.fb.group({
