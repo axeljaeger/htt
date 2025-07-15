@@ -1,35 +1,32 @@
-<app-svg-graphics-view 
-  [matrices]="matrices()"
-  [colors]="colors()"
-  [hoveredPicture]="hoveredPicture"
-  [hoveredTransformation]="hoveredTransformation"
-  [model]="model()"
-/>
+<app-svg-graphics-view [matrices]="matrices()" [pictureColors]="pictureColors()"
+  [transformationColors]="transformationColors()" [hoveredPicture]="hoveredPicture"
+  [hoveredTransformation]="hoveredTransformation" [model]="model()" />
 <div class="bottom-bar" [formGroup]="matrixForm">
   <div formArrayName="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
     cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
     @for (alias of matrixArray.controls; track alias; let i = $index) {
-    @if ($first) {
+      @if ($first) {
       <div class="math" before>x' =</div>
-      <app-add-transformations [color]="colors()[i]" (addTransformation)="addTransformation($event,i)" (mouseover)="hoverPicture(i)"
-      (mouseout)="hoverPicture(-1)"></app-add-transformations>
-    }
-      <app-matrix [formControlName]="i"  [class.selected]="hoveredTransformation === i" (mouseover)="hoverTransformation(i)"
-      (mouseout)="hoverTransformation(-1)" (deleteMatrix)="deleteTransformation(i)">
+      <app-add-transformations [color]="pictureColors()[i]" (addTransformation)="addTransformation($event,i)"
+        (mouseover)="hoverPicture(i)" (mouseout)="hoverPicture(-1)"></app-add-transformations>
+      }
+      <app-matrix [formControlName]="i" [color]="transformationColors()[i]" [class.selected]="hoveredTransformation === i"
+        (mouseover)="hoverTransformation(i)" (mouseout)="hoverTransformation(-1)"
+        (deleteMatrix)="deleteTransformation(i)">
       </app-matrix>
-    <app-add-transformations [color]="colors()[i+1]" (addTransformation)="addTransformation($event,i+1)" (mouseover)="hoverPicture(i+1)"
-      (mouseout)="hoverPicture(-1)" />
+      <app-add-transformations [color]="pictureColors()[i+1]" (addTransformation)="addTransformation($event,i+1)"
+        (mouseover)="hoverPicture(i+1)" (mouseout)="hoverPicture(-1)" />
       @if ($last) {
       <div class="math source" after>x
         <div class="button-container ">
-        <button class="icon" (click)="model.set('smiley')">
+          <button type="button" class="icon" (click)="model.set('smiley')" [style.--accent]="pictureColors().at(-1)">
             sentiment_satisfied
-        </button>
-        <button class="icon" (click)="model.set('home')">
-          home
-        </button>
+          </button>
+          <button type="button" class="icon" (click)="model.set('home')" [style.--accent]="pictureColors().at(-1)">
+            home
+          </button>
         </div>
-        </div>
+      </div>
       }
     }
   </div>

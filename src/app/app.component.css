@@ -3,7 +3,7 @@
     gap: 0px 0px;
     display: flex;
     flex-direction: column;
-    background-color: #3F4D4F;
+    background-color: light-dark(#9FB4B6,#3F4D4F);
 }
 
 app-svg-graphics-view {
@@ -26,17 +26,15 @@ div.bottom-bar {
 }
 
 .equation-list {
-    overflow-x: scroll;
+    overflow-x: auto;
     scrollbar-width: thin;
     scrollbar-color: #4d4d4d transparent;
     scrollbar-gutter: stable;
-    background-color: light-dark(white, black) ;
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 30px;
     gap: 10px;
-    border-radius: 1ex;
 }
 
 .cdk-drag-preview {

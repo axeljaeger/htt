@@ -5,8 +5,8 @@
   justify-content: center;
   opacity: 0.33;
   width: 1ex;
-  transition:
-    opacity 0.4s;
+  transition: opacity 0.4s;
+  background-color: color-mix(in srgb, var(--accent) 70%, gray 30%);
 }
 
 :host:hover {

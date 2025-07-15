@@ -49,7 +49,8 @@ const setAlpha = (hex : string, alpha : number) =>
 })
 export class SvgGraphicsViewComponent {
   matrices = input<Matrix[]>();
-  colors = input<string[]>();
+  pictureColors = input<string[]>();
+  transformationColors = input<string[]>();  
   hoveredPicture = input(-1);  
   hoveredTransformation = input(-1);
   model = input<Model>('home');
@@ -58,7 +59,6 @@ export class SvgGraphicsViewComponent {
         const previousMatrix = acc.matrixAcc;
         acc.matrixAcc = acc.matrixAcc.multiply(matrix);
   
-        // move outside of reduce
         const pictureSelected = this.hoveredPicture() !== -1;
         const transformationSelected = this.hoveredTransformation() !== -1;
         const lastIndex = this.matrices().length;
@@ -74,7 +74,7 @@ export class SvgGraphicsViewComponent {
           0.2;
   
         // Somehow include pictureAlpha in the color
-        const pictureColor = this.colors()[matrixIndex];
+        const pictureColor = this.pictureColors()[matrixIndex];
         const color = setAlpha(pictureColor, pictureAlpha);
         acc.pictures.push({ matrix: matrixString, color });
 
@@ -89,10 +89,10 @@ export class SvgGraphicsViewComponent {
           const selected = this.hoveredTransformation() === matrixIndex;
           
           const intensity = selected ? 0.8 : pictureSelected ? 0.1 : 0.2;
-          const startColor = this.colors()[matrixIndex+1];
-          const endColor = this.colors()[matrixIndex];
+          
+          
         
-          const color = setAlpha(endColor, intensity);
+          const color = setAlpha(this.transformationColors()[matrixIndex], intensity);
           acc.lines.push({path, color});
         } 
         return acc
