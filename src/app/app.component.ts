@@ -53,6 +53,8 @@ export class AppComponent {
     initialValue: this.matrixArray.getRawValue(),
   });
 
+  matrices = computed(() => this.matrixArrayValues().map(entry => entry.matrix));
+
   public pictureColors = computed(() => createPalette({
       map: 'viridis',
       steps: this.matrixArrayValues().length + 1,
@@ -64,12 +66,6 @@ export class AppComponent {
       steps: this.matrixArrayValues().length + 2,
     }).format('cssHex').slice(1)
   );
-
-  matrixForm = this.fb.group({
-    matrixArray: this.matrixArray
-  });
-
-  matrices = computed(() => this.matrixArrayValues().map(entry => entry.matrix));
 
   addTransformation(transformationType: TransformationType, index: number) {
     this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
