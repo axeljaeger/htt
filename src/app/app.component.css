@@ -56,13 +56,13 @@ math {
     margin-left: 0.5ex;
     align-items: center;
 
-    div button {
+    & div button {
         font-size: 24pt;
         margin: 0pt;
         padding: 8pt;
     }
 
-    :hover div button {
+    &:hover div button {
         opacity: 1;
     }
 }

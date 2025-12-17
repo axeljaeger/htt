@@ -1,9 +1,9 @@
 <app-svg-graphics-view [matrices]="matrices()" [pictureColors]="pictureColors()"
-  [transformationColors]="transformationColors()" [hoveredPicture]="hoveredPicture"
-  [hoveredTransformation]="hoveredTransformation" [model]="model()" />
-<div [formArray]="matrixArray" cdkDropList #doneList="cdkDropList" class="equation-list"
+  [transformationColors]="transformationColors()" [hoveredPicture]="hoveredPicture()"
+  [hoveredTransformation]="hoveredTransformation()" [model]="model()" />
+<div cdkDropList #doneList="cdkDropList" class="equation-list"
   cdkDropListOrientation="horizontal" cdkDropListLockAxis="x" (cdkDropListDropped)="drop($event)">
-  @for (alias of matrixArray.controls; track alias; let i = $index) {
+  @for (entry of matrixForm; let i = $index; track matrixModel()[i].id) {
     @if ($first) {
     <math xmlns="http://www.w3.org/1998/Math/MathML" before>
       <mi>x</mi>
@@ -11,12 +11,11 @@
       <mo>=</mo>
     </math>
     <app-add-transformations [color]="pictureColors()[i]" (addTransformation)="addTransformation($event,i)"
-      (mouseover)="hoverPicture(i)" (mouseout)="hoverPicture(-1)"></app-add-transformations>
+      (mouseover)="hoverPicture(i)" (mouseout)="hoverPicture(-1)"/>
     }
-    <app-matrix [formControlName]="i" [color]="transformationColors()[i]" [class.selected]="hoveredTransformation === i"
+    <app-matrix [field]="entry.entry" [color]="transformationColors()[i]" [class.selected]="hoveredTransformation() === i"
       (mouseover)="hoverTransformation(i)" (mouseout)="hoverTransformation(-1)"
-      (deleteMatrix)="deleteTransformation(i)">
-    </app-matrix>
+      (deleteMatrix)="deleteTransformation(i)" />
     <app-add-transformations [color]="pictureColors()[i+1]" (addTransformation)="addTransformation($event,i+1)"
       (mouseover)="hoverPicture(i+1)" (mouseout)="hoverPicture(-1)" />
     @if ($last) {

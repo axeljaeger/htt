@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Matrix } from '@babylonjs/core/Maths/math.vector';
 
 import { TransformationEntry } from '../app.component';
+import { FormValueControl } from '@angular/forms/signals';
 
 export type MatrixElement = 'a11' | 'a21' | 'a12' | 'a22';
 export type Dimension = 'x' | 'y';
@@ -13,37 +13,38 @@ export type Dimension = 'x' | 'y';
 @Component({
     selector: 'app-matrix',
     hostDirectives: [CdkDrag],
-    imports: [DecimalPipe, CdkDragHandle, FormsModule],
+    imports: [DecimalPipe, CdkDragHandle],
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.css'],
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            multi: true,
-            useExisting: MatrixComponent
-        }
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
       '[style.--accent]': 'color()'
     }
 })
-export class MatrixComponent implements ControlValueAccessor {
-  // Only used for storybook, application uses CVAs
-  matrixItem = signal<TransformationEntry>({ transformationType: 'Translation', matrix: Matrix.Identity()});
-  affectedDimensions = signal<Dimension[]>(['x']);
-
+export class MatrixComponent implements FormValueControl<TransformationEntry> {
+  value = model<TransformationEntry>();
   color = input<string>();
-  slider = model(0);
-  matrix = output<Matrix>();
   deleteMatrix = output<void>();
+
+  affectedDimensions = signal<Dimension[]>(['x']);  
+  sliderModel = signal(0);
+  
+  formConstraints = computed(() => this.value().transformationType === 'Rotation' ? {
+    min: -360,
+    max: 360,
+    step: 1
+  } : {
+    min: -10,
+    max: 10,
+    step: 0.1
+  });
 
   prevMatrix = Matrix.Identity();
  
   matrixValue = computed(() => {
     const dimensions = this.affectedDimensions();
-    const slider = this.slider();
-      switch (this.matrixItem().transformationType) {
+    const slider = this.sliderModel();
+      switch (this.value().transformationType) {
         case 'Translation': {
           const tx = dimensions.includes('x') ? slider : this.prevMatrix.getTranslation().x;
           const ty = dimensions.includes('y') ? slider : this.prevMatrix.getTranslation().y;
@@ -80,13 +81,16 @@ export class MatrixComponent implements ControlValueAccessor {
           return Matrix.Identity();
       }
     });
-    
-  setVal = effect(() => this.onChange({
-    transformationType: this.matrixItem().transformationType, 
-    matrix: this.matrixValue()
-  }));
   
-  clickAffectedDimension(dimension: Dimension, event: MouseEvent) {
+  updateValueFromSlider(val: number) {
+    this.sliderModel.set(val);
+        this.value.update(entry => ({
+    ...entry, 
+    matrix: this.matrixValue()
+    }));
+  }
+
+  clickAffectedDimension(dimension: Dimension) {
     const affectedDimensions = this.affectedDimensions();
     if (affectedDimensions.includes(dimension)) {
       this.affectedDimensions.set(affectedDimensions.filter(d => d !== dimension));
@@ -95,44 +99,34 @@ export class MatrixComponent implements ControlValueAccessor {
     }
   }
 
-  onChange = (quantity : TransformationEntry) => { };
-  formatRotationLabel(value: number): string {
-      return `${value}°`;
-  }
-
-  writeValue(obj: TransformationEntry): void {
-    this.matrixItem.set(obj);
-    switch (obj.transformationType) {
+  // This is to update the slider.
+  // only call this from when the input model changes.
+  // bail out if the change was caused by the slider itself.
+  writeValue = effect(() => {
+    const val = this.value();
+    switch (this.value().transformationType) {
       case 'Rotation': {
-        const rotationMatrix = obj.matrix.getRotationMatrix();
+        const rotationMatrix = val.matrix.getRotationMatrix();
         const r11 = rotationMatrix.getRow(0).x;
         const r21 = rotationMatrix.getRow(1).x
-        this.slider.set(180 * Math.atan2(r21, r11) / Math.PI);
+        
+        // this.sliderModel.set(180 * Math.atan2(r21, r11) / Math.PI);
       } break;
       case 'Scaling': {
-        const x = obj.matrix.getRow(0).x;
-        const y = obj.matrix.getRow(1).y;
-        this.slider.set(x);
+        const x = val.matrix.getRow(0).x;
+        const y = val.matrix.getRow(1).y;
+        this.sliderModel.set(x);
       } break;
       case 'Translation': {
-        const x = obj.matrix.getRow(3).x;
-        const y = obj.matrix.getRow(3).y;
-        this.slider.set(x);
+        const x = val.matrix.getRow(3).x;
+        const y = val.matrix.getRow(3).y;
+        this.sliderModel.set(x);
       } break;
       case 'Shearing': {
-        const x = obj.matrix.getRow(0).y;
-        const y = obj.matrix.getRow(1).x;
-        this.slider.set(x);
+        const x = val.matrix.getRow(0).y;
+        const y = val.matrix.getRow(1).x;
+        this.sliderModel.set(x);
       } break;
     }
-  }
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-  registerOnTouched(fn: any): void {
-    // throw new Error('Method not implemented.');
-  }
-  setDisabledState?(isDisabled: boolean): void {
-    // throw new Error('Method not implemented.');
-  }
+  });
 }

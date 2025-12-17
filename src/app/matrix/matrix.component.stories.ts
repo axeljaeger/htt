@@ -14,8 +14,10 @@ type Story = StoryObj<MatrixComponent>;
 
 export const Primary: Story = {
   args: {
-    //primary: true,
-
+    value: {
+      transformationType: 'Translation' as TransformationType,
+      matrix: Matrix.Translation(5, 0, 0)
+    }
   },
   parameters: {
     layout: 'centered',

@@ -1,7 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-
+import { Component, computed, signal } from '@angular/core';
 import {
   CdkDrag, CdkDragDrop, CdkDropList
 } from '@angular/cdk/drag-drop';
@@ -14,6 +11,7 @@ import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
 import { createPalette } from 'hue-map';
 import { SvgGraphicsViewComponent } from './svg-graphics-view/svg-graphics-view.component';
+import { Field, form } from '@angular/forms/signals';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
@@ -30,86 +28,82 @@ export interface TransformationEntry {
         MatrixComponent,
         AddTransformationsComponent,
         SvgGraphicsViewComponent,
-        ReactiveFormsModule
+        Field
     ]
 })
 export class AppComponent {
-  private fb = inject(FormBuilder);
-  title = 'htt';
+  protected model = signal<'home' | 'smiley'>('home');
 
-  model = signal<'home' | 'smiley'>('home');
+  protected hoveredPicture = signal(-1);
+  protected hoveredTransformation = signal(-1);
 
-  hoveredPicture = -1;
-  hoveredTransformation = -1;
-
-  matrixArray = this.fb.array([
-    this.fb.control({
+  protected matrixModel = signal<{ id: string; entry: TransformationEntry }[]>([{
+    id: crypto.randomUUID(),
+    entry: {
       transformationType: 'Translation',
       matrix: Matrix.Translation(5, 0, 0),
-    } as TransformationEntry)
-  ])
+    }
+  }]);
 
-  matrixArrayValues = toSignal(this.matrixArray.valueChanges, {
-    initialValue: this.matrixArray.getRawValue(),
-  });
+  protected matrixForm = form(this.matrixModel);
+  protected matrices = computed(() => this.matrixModel().map(entry => entry.entry.matrix));
 
-  matrices = computed(() => this.matrixArrayValues().map(entry => entry.matrix));
-
-  public pictureColors = computed(() => createPalette({
+  protected pictureColors = computed(() => createPalette({
       map: 'viridis',
-      steps: this.matrixArrayValues().length + 1,
+      steps: this.matrixModel().length + 1,
     }).format('cssHex')
   );
 
-  public transformationColors = computed(() => createPalette({
+  protected transformationColors = computed(() => createPalette({
       map: 'viridis',
-      steps: this.matrixArrayValues().length + 2,
+      steps: this.matrixModel().length + 2,
     }).format('cssHex').slice(1)
   );
 
-  addTransformation(transformationType: TransformationType, index: number) {
-    this.matrixArray.insert(index, this.fb.control(this.initialValue(transformationType)));
-    this.hoverTransformation(index);
-  }
-
-  drop(event: CdkDragDrop<TransformationEntry[]>) {
-    const control = this.matrixArray.controls.at(event.previousIndex);
-
-    this.matrixArray.removeAt(event.previousIndex);
-    this.matrixArray.insert(event.currentIndex, control);
-
-    this.hoverTransformation(event.currentIndex);
-  }
-
-  deleteTransformation(index: number): void {
-    this.matrixArray.removeAt(index);
-  }
-
-  initialValue(transformationType: TransformationType): TransformationEntry {
+  protected addTransformation(transformationType: TransformationType, index: number) {
     const matrix = {
         ['Rotation']: Matrix.RotationZ(Math.PI / 2.0),
         ['Translation']: Matrix.Translation(1, 0, 0),
         ['Scaling']: Matrix.Scaling(1, 1, 1),
         ['Shearing']: Matrix.Scaling(2, 2, 2),
     }[transformationType];
-    
-    return {
+
+    const entry = {
       transformationType,
       matrix,
-    };
+    }
+
+    this.matrixModel.update(models => models.toSpliced(index, 0, {
+        id: crypto.randomUUID(),
+        entry
+      })
+    );
+    this.hoverTransformation(index);
   }
 
-  matricesForTransformations(transformations: TransformationEntry[]): Matrix[] {
-    return transformations.map((trans) => trans.matrix);
+  protected drop(event: CdkDragDrop<TransformationEntry[]>) {
+    this.matrixModel.update(models => {
+      const moved = models[event.previousIndex];
+      return models
+        .toSpliced(event.previousIndex, 1)
+        .toSpliced(event.currentIndex, 0, moved);
+    });
+    this.hoverTransformation(event.currentIndex);
   }
 
-  hoverPicture(index: number) {
-    this.hoveredTransformation = -1
-    this.hoveredPicture = index;
+  protected deleteTransformation(index: number): void {
+    this.matrixModel.update(models => 
+        models.toSpliced(index, 1)
+    );
   }
 
-  hoverTransformation(index: number): void {
-    this.hoveredPicture = -1;
-    this.hoveredTransformation = index;
+  protected hoverPicture(index: number) {
+    this.hoveredTransformation.set(-1);
+    this.hoveredPicture.set(index);
+  }
+
+  protected hoverTransformation(index: number): void {
+    this.hoveredPicture.set(-1);
+    this.hoveredTransformation.set(index);
   }
 }
