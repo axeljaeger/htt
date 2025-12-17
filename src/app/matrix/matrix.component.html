@@ -1,25 +1,28 @@
-@let dimensions = affectedDimensions();
-@let m = matrixValue();
 <div class="header">
-    <div class="dragHandle" cdkDragHandle>{{matrixItem().transformationType}}</div>
+    <div class="dragHandle" cdkDragHandle>{{value().transformationType}}</div>
     <div class="icon deleteIcon" (click)="deleteMatrix.emit()">delete</div>
 </div>
+
+@let dimensions = affectedDimensions();
+@let m = matrixValue();
+@let editx = dimensions.includes('x');
+@let edity = dimensions.includes('y');
 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
     <mrow>
       <mo>(</mo>
       <mtable>
-        @switch (matrixItem().transformationType) {
+        @switch (value().transformationType) {
             @case ('Translation') {
                 <mtr>
                     <mtd><mn>1</mn></mtd>
                     <mtd><mn>0</mn></mtd>
-                    <mtd class="highlight" [class.selected]="dimensions.includes('x')"><mn (click)="clickAffectedDimension('x', $event)">{{ m.getTranslation().x | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx"><mn (click)="clickAffectedDimension('x')">{{ m.getTranslation().x | number: '1.2-2' }}</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
                     <mtd><mn>1</mn></mtd>
-                    <mtd class="highlight" [class.selected]="dimensions.includes('y')"><mn (click)="clickAffectedDimension('y', $event)">{{ m.getTranslation().y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="edity"><mn (click)="clickAffectedDimension('y')">{{ m.getTranslation().y | number: '1.2-2' }}</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
@@ -29,13 +32,13 @@
             }
             @case ('Scaling') {
                 <mtr>
-                    <mtd class="highlight" [class.selected]="dimensions.includes('x')" (click)="clickAffectedDimension('x', $event)"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
-                    <mtd class="highlight"[class.selected]="dimensions.includes('y')" (click)="clickAffectedDimension('y', $event)"><mn>{{ m.getRow(1).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"[class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.getRow(1).y | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
@@ -64,11 +67,11 @@
             @case ('Shearing') {
                 <mtr>
                     <mtd><mn>1</mn></mtd>
-                    <mtd class="highlight" [class.selected]="dimensions.includes('x')" (click)="clickAffectedDimension('x', $event)"><mn>{{ m.getRow(0).y | number: '1.2-2'}}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.getRow(0).y | number: '1.2-2'}}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
-                    <mtd class="highlight" [class.selected]="dimensions.includes('y')" (click)="clickAffectedDimension('y', $event)"><mn>{{ m.getRow(1).x | number: '1.2-2'}}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.getRow(1).x | number: '1.2-2'}}</mn></mtd>
                     <mtd><mn>1</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
@@ -83,10 +86,4 @@
     <mo>)</mo>
   </mrow>
 </math>
-
-
-@if (matrixItem().transformationType === 'Rotation') {
-  <input type="range" min="-360" max="360" value="0" [(ngModel)]="slider">
-  } @else {
-  <input type="range" min="-10" max="10" step="0.1" value="0" [(ngModel)]="slider">
-}
+<input type="range" [value]="sliderModel()" (input)="updateValueFromSlider($any($event.target).valueAsNumber)" [min]="formConstraints().min" [max]="formConstraints().max" [step]="formConstraints().step">
