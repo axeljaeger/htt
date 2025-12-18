@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, model, out
 import { DecimalPipe } from '@angular/common';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 
-import { Matrix } from '@babylonjs/core/Maths/math.vector';
-
 import { TransformationEntry } from '../app.component';
 import { FormValueControl } from '@angular/forms/signals';
 
@@ -39,46 +37,45 @@ export class MatrixComponent implements FormValueControl<TransformationEntry> {
     step: 0.1
   });
 
-  prevMatrix = Matrix.Identity();
+  prevMatrix = new DOMMatrix();
  
   matrixValue = computed(() => {
     const dimensions = this.affectedDimensions();
     const slider = this.sliderModel();
       switch (this.value().transformationType) {
         case 'Translation': {
-          const tx = dimensions.includes('x') ? slider : this.prevMatrix.getTranslation().x;
-          const ty = dimensions.includes('y') ? slider : this.prevMatrix.getTranslation().y;
-          const newMatrix = Matrix.Translation(tx,ty,0);
+          const tx = dimensions.includes('x') ? slider : this.prevMatrix.m41;
+          const ty = dimensions.includes('y') ? slider : this.prevMatrix.m42;
+          const newMatrix = new DOMMatrix().translate(tx,ty,0);
           this.prevMatrix = newMatrix
           return newMatrix;
         };
 
         case 'Rotation':
-          return Matrix.RotationZ(Math.PI * slider / 180);
+          return new DOMMatrix().rotateSelf(0,0, slider);
 
         case 'Scaling': {
-          const sx = dimensions.includes('x') ? slider : this.prevMatrix.getRow(0).x;
-          const sy = dimensions.includes('y') ? slider : this.prevMatrix.getRow(1).y;
+          const sx = dimensions.includes('x') ? slider : this.prevMatrix.m11;
+          const sy = dimensions.includes('y') ? slider : this.prevMatrix.m22;
 
-          const newMatrix = Matrix.Scaling(sx,sy,0);
+          const newMatrix = new DOMMatrix().scale(sx,sy,0);
           this.prevMatrix = newMatrix
 
           return newMatrix;
         };
-
+ 
         case 'Shearing': {
-          const sx = dimensions.includes('x') ? slider : this.prevMatrix.getRow(0).y;
-          const sy = dimensions.includes('y') ? slider : this.prevMatrix.getRow(1).x;
+          // might be the reason for problem with shearing
+          const sx = dimensions.includes('x') ? slider : this.prevMatrix.m12;
+          const sy = dimensions.includes('y') ? slider : this.prevMatrix.m21;
 
-          const newMatrix = Matrix.Identity();
-          newMatrix.setRowFromFloats(0, 1, sx, 0, 0);
-          newMatrix.setRowFromFloats(1, sy, 1, 0, 0);
+          const newMatrix = new DOMMatrix().skewX(sx).skewY(sy);
           this.prevMatrix = newMatrix
           return newMatrix;
         };
 
         default:
-          return Matrix.Identity();
+          return new DOMMatrix();
       }
     });
   
@@ -106,25 +103,23 @@ export class MatrixComponent implements FormValueControl<TransformationEntry> {
     const val = this.value();
     switch (this.value().transformationType) {
       case 'Rotation': {
-        const rotationMatrix = val.matrix.getRotationMatrix();
-        const r11 = rotationMatrix.getRow(0).x;
-        const r21 = rotationMatrix.getRow(1).x
-        
+        const r11 = val.matrix.m11;
+        const r21 = val.matrix.m21;        
         // this.sliderModel.set(180 * Math.atan2(r21, r11) / Math.PI);
       } break;
       case 'Scaling': {
-        const x = val.matrix.getRow(0).x;
-        const y = val.matrix.getRow(1).y;
+        const x = val.matrix.m11;
+        const y = val.matrix.m22;
         this.sliderModel.set(x);
       } break;
       case 'Translation': {
-        const x = val.matrix.getRow(3).x;
-        const y = val.matrix.getRow(3).y;
+        const x = val.matrix.m41;
+        const y = val.matrix.m42;
         this.sliderModel.set(x);
       } break;
       case 'Shearing': {
-        const x = val.matrix.getRow(0).y;
-        const y = val.matrix.getRow(1).x;
+        const x = val.matrix.m12;
+        const y = val.matrix.m21;
         this.sliderModel.set(x);
       } break;
     }

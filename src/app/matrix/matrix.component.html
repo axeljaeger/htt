@@ -17,12 +17,12 @@
                 <mtr>
                     <mtd><mn>1</mn></mtd>
                     <mtd><mn>0</mn></mtd>
-                    <mtd class="highlight" [class.selected]="editx"><mn (click)="clickAffectedDimension('x')">{{ m.getTranslation().x | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx"><mn (click)="clickAffectedDimension('x')">{{ m.m41 | number: '1.2-2' }}</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
                     <mtd><mn>1</mn></mtd>
-                    <mtd class="highlight" [class.selected]="edity"><mn (click)="clickAffectedDimension('y')">{{ m.getTranslation().y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="edity"><mn (click)="clickAffectedDimension('y')">{{ m.m42 | number: '1.2-2' }}</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
@@ -32,13 +32,13 @@
             }
             @case ('Scaling') {
                 <mtr>
-                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.m11 | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
                     <mtd><mn>0</mn></mtd>
-                    <mtd class="highlight"[class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.getRow(1).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"[class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.m22 | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
@@ -49,13 +49,13 @@
             }
             @case ('Rotation') {
                 <mtr>
-                    <mtd class="highlight"><mn>{{ m.getRow(0).x | number: '1.2-2' }}</mn></mtd>
-                    <mtd class="highlight"><mn>{{ m.getRow(0).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"><mn>{{ m.m11 | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"><mn>{{ m.m21 | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
-                    <mtd class="highlight"><mn>{{ m.getRow(1).x | number: '1.2-2' }}</mn></mtd>
-                    <mtd class="highlight"><mn>{{ m.getRow(1).y | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"><mn>{{ m.m12 | number: '1.2-2' }}</mn></mtd>
+                    <mtd class="highlight"><mn>{{ m.m22 | number: '1.2-2' }}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
@@ -67,11 +67,11 @@
             @case ('Shearing') {
                 <mtr>
                     <mtd><mn>1</mn></mtd>
-                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.getRow(0).y | number: '1.2-2'}}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="editx" (click)="clickAffectedDimension('x')"><mn>{{ m.m21 | number: '1.2-2'}}</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>
                   <mtr>
-                    <mtd class="highlight" [class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.getRow(1).x | number: '1.2-2'}}</mn></mtd>
+                    <mtd class="highlight" [class.selected]="edity" (click)="clickAffectedDimension('y')"><mn>{{ m.m12 | number: '1.2-2'}}</mn></mtd>
                     <mtd><mn>1</mn></mtd>
                     <mtd><mn>0</mn></mtd>
                   </mtr>

@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { MatrixComponent } from './matrix.component';
-import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { TransformationType } from '../add-transformations/add-transformations.component';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
@@ -16,7 +15,7 @@ export const Primary: Story = {
   args: {
     value: {
       transformationType: 'Translation' as TransformationType,
-      matrix: Matrix.Translation(5, 0, 0)
+      matrix: new DOMMatrix().translate(5, 0, 0)
     }
   },
   parameters: {
