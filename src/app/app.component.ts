@@ -7,7 +7,6 @@ import {
   AddTransformationsComponent,
   TransformationType,
 } from './add-transformations/add-transformations.component';
-import { Matrix } from '@babylonjs/core/Maths/math.vector';
 import { MatrixComponent } from './matrix/matrix.component';
 import { createPalette } from 'hue-map';
 import { SvgGraphicsViewComponent } from './svg-graphics-view/svg-graphics-view.component';
@@ -15,7 +14,7 @@ import { Field, form } from '@angular/forms/signals';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
-  matrix: Matrix;
+  matrix: DOMMatrix;
 }
 
 @Component({
@@ -41,7 +40,7 @@ export class AppComponent {
     id: crypto.randomUUID(),
     entry: {
       transformationType: 'Translation',
-      matrix: Matrix.Translation(5, 0, 0),
+      matrix: new DOMMatrix().translate(5, 0, 0),
     }
   }]);
 
@@ -62,10 +61,10 @@ export class AppComponent {
 
   protected addTransformation(transformationType: TransformationType, index: number) {
     const matrix = {
-        ['Rotation']: Matrix.RotationZ(Math.PI / 2.0),
-        ['Translation']: Matrix.Translation(1, 0, 0),
-        ['Scaling']: Matrix.Scaling(1, 1, 1),
-        ['Shearing']: Matrix.Scaling(2, 2, 2),
+        ['Rotation']: new DOMMatrix().rotateSelf(0,0, 90),
+        ['Translation']: new DOMMatrix().translate(1, 0, 0),
+        ['Scaling']: new DOMMatrix().scale(1, 1, 1),
+        ['Shearing']: new DOMMatrix().scale(2, 2, 2),
     }[transformationType];
 
     const entry = {
