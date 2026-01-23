@@ -12,7 +12,7 @@ jobs:
           npm ci
           npx ng build --base-href https://axeljaeger.github.io/htt/
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: "dist/htt/browser"
 
