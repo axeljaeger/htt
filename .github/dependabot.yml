@@ -8,7 +8,9 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "tuesday"
+      time: "03:00"
     groups:
       storybook:
         patterns:
@@ -25,3 +27,9 @@ updates:
       eslint:
         patterns:
             - "@typescript-eslint/*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "03:00"
