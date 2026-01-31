@@ -13,7 +13,7 @@
     <app-add-transformations [color]="pictureColors()[i]" (addTransformation)="addTransformation($event,i)"
       (mouseover)="hoverPicture(i)" (mouseout)="hoverPicture(-1)"/>
     }
-    <app-matrix [field]="entry.entry" [color]="transformationColors()[i]" [class.selected]="hoveredTransformation() === i"
+    <app-matrix [formField]="entry.entry" [color]="transformationColors()[i]" [class.selected]="hoveredTransformation() === i"
       (mouseover)="hoverTransformation(i)" (mouseout)="hoverTransformation(-1)"
       (deleteMatrix)="deleteTransformation(i)" />
     <app-add-transformations [color]="pictureColors()[i+1]" (addTransformation)="addTransformation($event,i+1)"
