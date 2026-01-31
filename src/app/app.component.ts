@@ -1,16 +1,16 @@
 import { Component, computed, signal } from '@angular/core';
 import {
-  CdkDrag, CdkDragDrop, CdkDropList
+  CdkDrag, type CdkDragDrop, CdkDropList
 } from '@angular/cdk/drag-drop';
 
 import {
   AddTransformationsComponent,
-  TransformationType,
+  type TransformationType,
 } from './add-transformations/add-transformations.component';
 import { MatrixComponent } from './matrix/matrix.component';
 import { createPalette } from 'hue-map';
 import { SvgGraphicsViewComponent } from './svg-graphics-view/svg-graphics-view.component';
-import { Field, form } from '@angular/forms/signals';
+import { FormField, form } from '@angular/forms/signals';
 
 export interface TransformationEntry {
   transformationType: TransformationType;
@@ -27,7 +27,7 @@ export interface TransformationEntry {
         MatrixComponent,
         AddTransformationsComponent,
         SvgGraphicsViewComponent,
-        Field
+        FormField
     ]
 })
 export class AppComponent {
@@ -61,10 +61,10 @@ export class AppComponent {
 
   protected addTransformation(transformationType: TransformationType, index: number) {
     const matrix = {
-        ['Rotation']: new DOMMatrix().rotateSelf(0,0, 90),
-        ['Translation']: new DOMMatrix().translate(1, 0, 0),
-        ['Scaling']: new DOMMatrix().scale(1, 1, 1),
-        ['Shearing']: new DOMMatrix().scale(2, 2, 2),
+        "Rotation": new DOMMatrix().rotateSelf(0,0, 90),
+        "Translation": new DOMMatrix().translate(1, 0, 0),
+        "Scaling": new DOMMatrix().scale(1, 1, 1),
+        "Shearing": new DOMMatrix().scale(2, 2, 2),
     }[transformationType];
 
     const entry = {
