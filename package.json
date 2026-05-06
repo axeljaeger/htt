@@ -31,7 +31,7 @@
     "@angular/cli": "21.2.9",
     "@angular/compiler-cli": "21.2.11",
     "@angular/platform-browser-dynamic": "21.2.11",
-    "@chromatic-com/storybook": "5.0.1",
+    "@chromatic-com/storybook": "5.1.2",
     "@storybook/addon-docs": "10.3.4",
     "@storybook/addon-links": "10.3.4",
     "@storybook/angular": "10.3.4",
