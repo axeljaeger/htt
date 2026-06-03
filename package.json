@@ -45,5 +45,11 @@
   },
   "overrides": {
     "storybook": "$storybook"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.6": true,
+    "esbuild@0.27.3": true,
+    "lmdb@3.5.1": true,
+    "msgpackr-extract@3.0.4": true
   }
 }
