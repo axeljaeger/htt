@@ -36,7 +36,7 @@
     "@storybook/addon-links": "10.4.2",
     "@storybook/angular": "10.4.2",
     "@types/colormap": "2.3.4",
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "jsdom": "29.1.1",
     "storybook": "10.4.2",
