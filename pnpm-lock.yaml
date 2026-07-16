@@ -88,6 +88,12 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@types/node@26.1.1)(jsdom@29.1.1)(vite@7.3.2(@types/node@26.1.1)(jiti@2.7.0)(less@4.4.2)(sass@1.97.3)(terser@5.46.0))
 
+  .angular/cache/angular-cli-tmp-packages-0YoWEJ:
+    dependencies:
+      '@angular/cli':
+        specifier: 22.0.7
+        version: 22.0.7(@types/node@26.1.1)(chokidar@5.0.0)
+
   .angular/cache/angular-cli-tmp-packages-bwqjOX:
     dependencies:
       '@angular/cli':
