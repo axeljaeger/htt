@@ -1,4 +1,4 @@
-import type { StorybookConfig } from "@storybook/angular";
+import type { StorybookConfig } from "@storybook/angular-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -8,8 +8,10 @@ const config: StorybookConfig = {
     "@storybook/addon-docs"
   ],
   framework: {
-    name: "@storybook/angular",
-    options: {},
+    name: "@storybook/angular-vite",
+    options: {
+      compodoc: false,
+    },
   },
   docs: {},
 };
