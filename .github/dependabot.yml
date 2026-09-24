@@ -14,19 +14,21 @@ updates:
     groups:
       storybook:
         patterns:
-            - "storybook"
-            - "@storybook/*"
-            - "chromatic"
+          - "storybook"
+          - "@storybook/*"
+          - "@chromatic-com/*"
+          - "@types/react"
+          - "@types/react-dom"
       angular:
         patterns:
-            - "@angular/*"
-            - "@angular-devkit/build-angular"
+          - "@angular/*"
+          - "@angular-devkit/build-angular"
       babylonjs:
         patterns:
-            - "@babylonjs/*"
+          - "@babylonjs/*"
       eslint:
         patterns:
-            - "@typescript-eslint/*"
+          - "@typescript-eslint/*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
